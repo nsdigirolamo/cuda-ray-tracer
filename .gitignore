@@ -1,0 +1,14 @@
+# Dotfiles
+.vscode
+**/.DS_Store
+# Objects
+obj*
+# Programs
+a.out
+testing
+tracing
+# Images
+*.ppm
+# Debugging
+valgrind-out.*
+vgcore.*
