@@ -33,27 +33,3 @@ Color::Color (const int rgb_hex_value) {
 
     *this = { r / 256, g / 256, b / 256 };
 }
-
-const double& Color::r () const {
-    return (*this)[0];
-}
-
-const double& Color::g () const {
-    return (*this)[1];
-}
-
-const double& Color::b () const { 
-    return (*this)[2];
-}
-
-double& Color::r () {
-    return (*this)[0];
-}
-
-double& Color::g () {
-    return (*this)[1];
-}
-
-double& Color::b () { 
-    return (*this)[2];
-}

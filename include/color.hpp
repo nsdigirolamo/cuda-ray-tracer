@@ -15,14 +15,6 @@ class Color : public Vector<3> {
         Color (const Vector<3>& vector);
         Color (const double red, const double green, const double blue);
         Color (const int rgb_hex_value);
-
-        const double& r () const;
-        const double& g () const;
-        const double& b () const;
-
-        double& r ();
-        double& g ();
-        double& b ();
 };
 
 #define SKY SKYBLUE
