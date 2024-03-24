@@ -2,8 +2,6 @@
 #include "test_utils.hpp"
 #include "vector.hpp"
 
-using namespace doctest;
-
 TEST_SUITE ("Initialization Tests") {
 
     TEST_CASE ("Default initialization should make vector have all zeroes.") {
@@ -11,7 +9,7 @@ TEST_SUITE ("Initialization Tests") {
         Vector<3> actual;
 
         for (int i = 0; i < 3; ++i) {
-            CHECK(0.0 == Approx(actual[i]));
+            CHECK(0.0 == doctest::Approx(actual[i]));
         }
     }
 
@@ -21,7 +19,7 @@ TEST_SUITE ("Initialization Tests") {
         Vector<3> actual { expected };
 
         for (int i = 0; i < 3; ++i) {
-            CHECK(expected[i] == Approx(actual[i]));
+            CHECK(expected[i] == doctest::Approx(actual[i]));
         }
     }
 }
