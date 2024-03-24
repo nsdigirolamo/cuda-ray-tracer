@@ -30,8 +30,8 @@ TEST_SUITE ("Addition Tests") {
 
         Vector<3> actual {{ 1.20, 3.40, 5.60 }};
         Vector<3> rhs {{ 7.80, 9.10, 11.12 }};
-        actual += rhs;
 
+        actual += rhs;
         Vector<3> expected {{ 9.00, 12.50, 16.72 }};
 
         CHECK_VECTORS(expected, actual);
@@ -41,8 +41,8 @@ TEST_SUITE ("Addition Tests") {
 
         Vector<3> lhs {{ 10.11, 11.12, 13.14 }};
         Vector<3> rhs {{ 15.16, 17.18, 19.20 }};
-        Vector<3> actual = lhs + rhs;
 
+        Vector<3> actual = lhs + rhs;
         Vector<3> expected {{ 25.27, 28.30, 32.34 }};
 
         CHECK_VECTORS(expected, actual);
@@ -55,8 +55,8 @@ TEST_SUITE ("Subtraction Tests") {
 
         Vector<3> actual {{ 1.20, 3.40, 5.60 }};
         Vector<3> rhs {{ 7.80, 9.10, 11.12 }};
-        actual -= rhs;
 
+        actual -= rhs;
         Vector<3> expected {{ -6.60, -5.70, -5.52 }};
 
         CHECK_VECTORS(expected, actual);
@@ -66,8 +66,8 @@ TEST_SUITE ("Subtraction Tests") {
 
         Vector<3> lhs {{ 10.11, 11.12, 13.14 }};
         Vector<3> rhs {{ 15.16, 17.18, 19.20 }};
-        Vector<3> actual = lhs - rhs;
 
+        Vector<3> actual = lhs - rhs;
         Vector<3> expected {{ -5.05, -6.06, -6.06 }};
 
         CHECK_VECTORS(expected, actual);
@@ -81,32 +81,32 @@ TEST_SUITE ("Multiplication Tests") {
     TEST_CASE ("*= operator should multiply and assign.") {
 
         Vector<3> actual {{ 1.2, 3.4, 5.6 }};
-        actual *= factor;
 
+        actual *= factor;
         Vector<3> expected {{ 3, 8.5, 14 }};
 
-        CHECK_VECTORS(actual, expected);
+        CHECK_VECTORS(expected, actual);
     }
 
     TEST_CASE ("* operator should multiply.") {
 
         Vector<3> vector {{ 7.8, 9.10, 11.12 }};
-        Vector<3> actual = vector * factor;
 
+        Vector<3> actual = vector * factor;
         Vector<3> expected {{ 19.5, 22.75, 27.8 }};
 
-        CHECK_VECTORS(actual, expected);
+        CHECK_VECTORS(expected, actual);
     }
 
     TEST_CASE ("Hadamard product should multiply two vectors element-wise.") {
 
         Vector<3> lhs {{ 1.2, 3.4, 5.6 }};
         Vector<3> rhs {{ 7.8, 9.10, 11.12 }};
-        Vector<3> actual = hadamard(lhs, rhs);
 
+        Vector<3> actual = hadamard(lhs, rhs);
         Vector<3> expected {{ 9.36, 30.94, 62.272 }};
 
-        CHECK_VECTORS(actual, expected);
+        CHECK_VECTORS(expected, actual);
     }
 }
 
@@ -117,21 +117,21 @@ TEST_SUITE ("Division Tests") {
     TEST_CASE ("/= operator should divide and assign.") {
 
         Vector<3> actual {{ 1.2, 3.4, 5.6 }};
-        actual /= divisor;
 
+        actual /= divisor;
         Vector<3> expected {{ 0.8, 2.26666, 3.73333 }};
 
-        CHECK_VECTORS(actual, expected);
+        CHECK_VECTORS(expected, actual);
     }
 
     TEST_CASE ("/ operator should divide.") {
 
         Vector<3> vector {{ 7.8, 9.10, 11.12 }};
-        Vector<3> actual = vector / divisor;
 
+        Vector<3> actual = vector / divisor;
         Vector<3> expected {{ 5.2, 6.06666, 7.41333 }};
 
-        CHECK_VECTORS(actual, expected);
+        CHECK_VECTORS(expected, actual);
     }
 }
 
@@ -216,5 +216,75 @@ TEST_SUITE ("Equality Tests") {
         Vector<3> lhs = {{ 1.0, 2.0, 3.0 }};
         Vector<3> rhs = {{ 1.00002, 2.00002, 3.00002 }};
         CHECK_FALSE(isApprox(lhs, rhs, 0.00001));
+    }
+}
+
+TEST_SUITE ("Product Tests") {
+
+    TEST_CASE ("Dot product.") {
+
+        Vector<3> lhs {{ 1.0, 2.0, 3.0 }};
+        Vector<3> rhs {{ 1.0, 2.0, 3.0 }};
+
+        double actual = dot(lhs, rhs);
+        double expected = 14.0;
+
+        CHECK(expected == doctest::Approx(actual));
+    }
+
+    TEST_CASE ("Cross product.") {
+
+        Vector<3> lhs {{ 1.0, 2.0, 3.0 }};
+        Vector<3> rhs {{ 4.0, 5.0, 6.0 }};
+
+        Vector<3> actual = CROSS(lhs, rhs);
+        Vector<3> expected {{ -3, 6, -3 }};
+
+        CHECK_VECTORS(expected, actual);
+    }
+}
+
+TEST_SUITE ("Property Tests") {
+
+    TEST_CASE ("The height method should return the height of the vector.") {
+
+        const unsigned int height = 3;
+        Vector<height> vector;
+        CHECK(height == doctest::Approx(vector.height()));
+    }
+
+    TEST_CASE ("The length_squared method should return the length of the vector squared.") {
+
+        Vector<3> vector {{ 1.0, 2.0, 3.0 }};
+        CHECK(14.0 == doctest::Approx(vector.length_squared()));
+    }
+
+    TEST_CASE ("The length method should return the length of the vector.") {
+
+        Vector<3> vector {{ 1.0, 2.0, 3.0 }};
+        CHECK(sqrt(14.0) == doctest::Approx(vector.length()));
+    }
+}
+
+TEST_SUITE ("Reflection Tests") {
+
+    TEST_CASE ("Reflecting off a surface should result in a reflected vector.") {
+
+        Vector<3> incoming {{ 1.0, -1.0, 0.0 }};
+        UnitVector<3> surface_normal {{ 0.0, 1.0, 0.0 }};
+
+        Vector<3> actual = reflect(incoming, surface_normal);
+        Vector<3> expected {{ 1.0, 1.0, 0.0 }};
+
+        CHECK_VECTORS(expected, actual);
+    }
+}
+
+TEST_SUITE ("Refraction Tests") {
+
+    TEST_CASE ("Refracting through an object should result in a refracted vector.") {
+
+        // TODO
+
     }
 }
