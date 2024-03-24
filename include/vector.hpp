@@ -11,7 +11,7 @@ class Vector {
 
     private:
 
-        double values[N]; // The elements of the vector.
+        double values[N];
 
     public:
 
