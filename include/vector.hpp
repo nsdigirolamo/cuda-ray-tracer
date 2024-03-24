@@ -1,7 +1,7 @@
 #ifndef VECTOR_HPP
 #define VECTOR_HPP
 
-#include <cmath>
+#include "math.h"
 
 template <unsigned int N>
 class UnitVector;
@@ -166,9 +166,7 @@ bool operator== (const Vector<N>& lhs, const Vector<N>& rhs) {
 template <unsigned int N>
 bool isApprox (const Vector<N>& lhs, const Vector<N>& rhs, const double epsilon = 0.001) {
     for (int i = 0; i < N; ++i) {
-        double diff = lhs[i] - rhs[i];
-        if (diff < 0) diff *= -1;
-        if (epsilon < diff) return false;
+        if (epsilon < abs(lhs[i] - rhs[i])) return false;
     }
     return true;
 }
