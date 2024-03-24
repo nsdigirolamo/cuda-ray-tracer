@@ -1,13 +1,16 @@
 #ifndef HIT_HPP
 #define HIT_HPP
 
+#include "ray.hpp"
 #include "vector.hpp"
 
 class Hit {
 
     public:
 
-        const UnitVector<3> incoming; // The ray that caused the hit.
+        const bool exists; // True if the hit exists.
+
+        const Ray incoming; // The ray that caused the hit.
         const double distance; // The distance along the incoming ray where the hit occurred.
 
         const Point origin; // The location of the hit in the scene.
