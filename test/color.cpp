@@ -43,7 +43,7 @@ TEST_SUITE ("Initialization Tests") {
 
         CHECK(expected_r == doctest::Approx(actual[0]));
         CHECK(expected_g == doctest::Approx(actual[1]));
-        CHECK(expected_b == doctest::Approx(actual[2])); 
+        CHECK(expected_b == doctest::Approx(actual[2]));
     }
 
     TEST_CASE ("Initialization with hex value should make color have appropriate values.") {
