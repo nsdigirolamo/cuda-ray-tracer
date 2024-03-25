@@ -14,7 +14,7 @@ class Diffuse : public Material {
         Diffuse (const Color& color);
 
         Color getColor () const;
-        Ray scatter (const Hit& hit, const UnitVector<3>& random_offset) const;
+        Ray scatter (const Hit& hit) const;
 };
 
 #endif

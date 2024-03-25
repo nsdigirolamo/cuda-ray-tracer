@@ -9,10 +9,20 @@ Color Diffuse::getColor () const {
     return this->color;
 }
 
-Ray Diffuse::scatter (const Hit& hit, const UnitVector<3>& random_offset) const {
-    assert(hit.exists);
+Ray Diffuse::scatter (const Hit& hit) const {
+
+    /**
+     * TODO: Implement random offset
+     *
+     *   return {
+     *       hit.origin,
+     *       hit.surface_normal + random_offset
+     *   };
+     *
+     */
+
     return {
         hit.origin,
-        hit.surface_normal + random_offset
+        hit.surface_normal
     };
 }
