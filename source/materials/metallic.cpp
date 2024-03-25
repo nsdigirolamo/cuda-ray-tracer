@@ -14,10 +14,20 @@ double Metallic::getBlur () const {
     return this->blur;
 }
 
-Ray Metallic::scatter (const Hit& hit, const UnitVector<3>& random_offset) const {
-    assert(hit.exists);
+Ray Metallic::scatter (const Hit& hit) const {
+
+    /**
+     * TODO: Implement random offset with blur
+     *
+     *   return {
+     *       hit.origin,
+     *       reflect(hit.incoming.direction, hit.surface_normal)
+     *   };
+     *
+     */
+
     return {
         hit.origin,
-        reflect(hit.incoming.direction, hit.surface_normal) + (blur * random_offset)
+        reflect(hit.incoming.direction, hit.surface_normal)
     };
 }
