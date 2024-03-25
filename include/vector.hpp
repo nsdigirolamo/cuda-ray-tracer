@@ -244,7 +244,7 @@ template <unsigned int N>
 Vector<N> refract (const UnitVector<N>& vector, const UnitVector<N>& surface_normal, const double refractive_index) {
     double cos_theta = dot(-1 * vector, surface_normal);
     Vector<3> normal_orthogonal = refractive_index * (vector + cos_theta * surface_normal);
-    Vector<3> normal_parallel = -1 * sqrt(abs(1 - normal_orthogonal.length_squared()));
+    Vector<3> normal_parallel = -1 * sqrt(abs(1 - normal_orthogonal.length_squared())) * surface_normal;
     return normal_orthogonal + normal_parallel;
 }
 
