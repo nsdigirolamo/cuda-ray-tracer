@@ -7,6 +7,11 @@ Plane::Plane (const Point& origin, const UnitVector<3> normal, Material* materia
     , material(material)
 { }
 
+Plane::~Plane () {
+    delete this->material;
+    this->material = NULL;
+}
+
 OptionalHit Plane::checkHit (const Ray& ray) const {
 
     OptionalHit opt;

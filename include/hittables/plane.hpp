@@ -14,6 +14,7 @@ class Plane : public Hittable {
     public:
 
         Plane (const Point& origin, const UnitVector<3> normal, Material* material);
+        ~Plane ();
 
         OptionalHit checkHit (const Ray& ray) const;
         Material* getMaterial ();

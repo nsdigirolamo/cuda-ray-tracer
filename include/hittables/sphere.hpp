@@ -14,6 +14,7 @@ class Sphere : public Hittable {
     public:
 
         Sphere (const Point& origin, double radius, Material* material);
+        ~Sphere ();
 
         OptionalHit checkHit (const Ray& ray) const;
         Material* getMaterial ();

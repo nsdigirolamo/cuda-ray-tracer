@@ -6,6 +6,11 @@ Sphere::Sphere (const Point& origin, double radius, Material* material)
     , material(material)
 { }
 
+Sphere::~Sphere () {
+    delete this->material;
+    this->material = NULL;
+}
+
 OptionalHit Sphere::checkHit (const Ray& ray) const {
 
     OptionalHit opt;
