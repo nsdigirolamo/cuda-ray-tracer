@@ -1,4 +1,3 @@
-#include "color.hpp"
 #include "hittables/plane.hpp"
 #include "lib/doctest/doctest.hpp"
 #include "materials/metallic.hpp"
@@ -6,7 +5,7 @@
 
 TEST_SUITE ("Metallic Scatter Tests") {
 
-    TEST_CASE ("Scatter a plane's front face.") {
+    TEST_CASE ("Scattering on a plane's front face should reflect properly.") {
 
         Plane plane {
             {{ 0, 0, 0 }},
@@ -36,7 +35,7 @@ TEST_SUITE ("Metallic Scatter Tests") {
         CHECK_HITS(expected, actual);
     }
 
-    TEST_CASE ("Scatter a plane's rear face.") {
+    TEST_CASE ("Scattering on a plane's rear face should reflect properly.") {
 
         Plane plane {
             {{ 0, 0, 0 }},
