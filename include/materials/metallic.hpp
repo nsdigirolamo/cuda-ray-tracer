@@ -16,7 +16,7 @@ class Metallic : public Material {
 
         Color getColor () const;
         double getBlur () const;
-        Ray scatter (const Hit& hit, const UnitVector<3>& random_offset) const;
+        Ray scatter (const Hit& hit) const;
 };
 
 #endif
