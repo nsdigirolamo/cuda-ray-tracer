@@ -10,8 +10,8 @@ class OptionalHit {
         bool exists;
         Hit hit;
 
-        OptionalHit ();
-        OptionalHit (const Hit& hit);
+        __host__ __device__ OptionalHit ();
+        __host__ __device__ OptionalHit (const Hit& hit);
 };
 
 #endif

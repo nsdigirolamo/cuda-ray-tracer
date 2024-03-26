@@ -1,11 +1,11 @@
 #include "hit.hpp"
 
-Hit::Hit ()
+__host__ __device__ Hit::Hit ()
     : distance(0)
     , is_front(true)
 { }
 
-Hit::Hit (
+__host__ __device__ Hit::Hit (
     const Ray& incoming,
     const double distance,
     const Point& origin,

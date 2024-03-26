@@ -184,14 +184,14 @@ __global__ void traceSample (
 
     int height = gridDim.y;
     int width = gridDim.x;
-    int samples_per_pixel = blockDim.x;
 
     int row = blockIdx.y;
     int col = blockIdx.x;
     int depth = threadIdx.x;
 
     Ray ray = camera.getInitialRay();
-    Color traced = { 1.0, 1.0, 1.0 };
+    // Color traced { 1.0, 1.0, 1.0 };
+    Color traced;
 
     int bounce = 0;
 

@@ -16,106 +16,106 @@ class Vector {
 
     public:
 
-        Vector () {
+        __host__ __device__ Vector () {
             for (int i = 0; i < N; ++i) {
                 this->values[i] = 0;
             }
         }
 
-        Vector (const double (&values)[N]) {
+        __host__ __device__ Vector (const double (&values)[N]) {
             for (int i = 0; i < N; ++i) {
                 this->values[i] = values[i];
             }
         }
 
-        Vector<N>& operator+= (const Vector<N>& rhs) {
+        __host__ __device__ Vector<N>& operator+= (const Vector<N>& rhs) {
             for (int i = 0; i < N; ++i) {
                 (*this)[i] += rhs[i];
             }
             return *this;
         }
 
-        Vector<N>& operator-= (const Vector<N>& rhs) {
+        __host__ __device__ Vector<N>& operator-= (const Vector<N>& rhs) {
             for (int i = 0; i < N; ++i) {
                 (*this)[i] -= rhs[i];
             }
             return *this;
         }
 
-        Vector<N>& operator*= (const double factor) {
+        __host__ __device__ Vector<N>& operator*= (const double factor) {
             for (int i = 0; i < N; ++i) {
                 (*this)[i] *= factor;
             }
             return *this;
         }
 
-        Vector<N>& operator/= (const double divisor) {
+        __host__ __device__ Vector<N>& operator/= (const double divisor) {
             for (int i = 0; i < N; ++i) {
                 (*this)[i] /= divisor;
             }
             return *this;
         }
 
-        double& operator[] (const unsigned int index) {
+        __host__ __device__ double& operator[] (const unsigned int index) {
             return this->values[index];
         }
 
-        const double& operator[] (const unsigned int index) const {
+        __host__ __device__ const double& operator[] (const unsigned int index) const {
             return this->values[index];
         }
 
         /**
          * @return The number of elements in the vector.
          */
-        unsigned int height () const {
+        __host__ __device__ unsigned int height () const {
             return N;
         }
 
         /**
          * @return The vector's length squared.
          */
-        double length_squared () const {
+        __host__ __device__ double length_squared () const {
             return dot(*this, *this);
         }
 
         /**
          * @return The vector's length.
          */
-        double length () const {
+        __host__ __device__ double length () const {
             return sqrtf(this->length_squared());
         }
 
         /**
          * @return The vector's direction as a unit vector.
          */
-        UnitVector<N> direction () const {
+        __host__ __device__ UnitVector<N> direction () const {
             return (*this) / this->length();
         }
 };
 
 template <unsigned int N>
-Vector<N> operator+ (const Vector<N>& lhs, const Vector<N>& rhs) {
+__host__ __device__ Vector<N> operator+ (const Vector<N>& lhs, const Vector<N>& rhs) {
     Vector<N> result = lhs;
     result += rhs;
     return result;
 }
 
 template <unsigned int N>
-Vector<N> operator- (const Vector<N>& lhs, const Vector<N>& rhs) {
+__host__ __device__ Vector<N> operator- (const Vector<N>& lhs, const Vector<N>& rhs) {
     Vector<N> result = lhs;
     result -= rhs;
     return result;
 }
 
 template <unsigned int N>
-Vector<N> operator* (const Vector<N>& vector, const double factor) {
+__host__ __device__ Vector<N> operator* (const Vector<N>& vector, const double factor) {
     Vector<N> result = vector;
     result *= factor;
     return result;
 }
 
 template <unsigned int N>
-Vector<N> operator* (const double factor, const Vector<N>& vector) {
+__host__ __device__ Vector<N> operator* (const double factor, const Vector<N>& vector) {
     Vector<N> result = vector;
     result *= factor;
     return result;
@@ -131,7 +131,7 @@ Vector<N> operator* (const double factor, const Vector<N>& vector) {
  * @return The hadamard product vector.
  */
 template <unsigned int N>
-Vector<N> hadamard (const Vector<N>& lhs, const Vector<N>& rhs) {
+__host__ __device__ Vector<N> hadamard (const Vector<N>& lhs, const Vector<N>& rhs) {
     Vector<N> result;
     for (int i = 0; i < N; ++i) {
         result[i] = lhs[i] * rhs[i];
@@ -140,14 +140,14 @@ Vector<N> hadamard (const Vector<N>& lhs, const Vector<N>& rhs) {
 }
 
 template <unsigned int N>
-Vector<N> operator/ (const Vector<N>& vector, const double divisor) {
+__host__ __device__ Vector<N> operator/ (const Vector<N>& vector, const double divisor) {
     Vector<N> result = vector;
     result /= divisor;
     return result;
 }
 
 template <unsigned int N>
-bool operator== (const Vector<N>& lhs, const Vector<N>& rhs) {
+__host__ __device__ bool operator== (const Vector<N>& lhs, const Vector<N>& rhs) {
     for (int i = 0; i < N; ++i) {
         if (lhs[i] != rhs[i]) return false;
     }
@@ -165,7 +165,7 @@ bool operator== (const Vector<N>& lhs, const Vector<N>& rhs) {
  * @return False if the difference between any two elements in the vectors is greater than epsilon.
  */
 template <unsigned int N>
-bool isApprox (const Vector<N>& lhs, const Vector<N>& rhs, const double epsilon = 0.001) {
+__host__ __device__ bool isApprox (const Vector<N>& lhs, const Vector<N>& rhs, const double epsilon = 0.001) {
     for (int i = 0; i < N; ++i) {
         if (epsilon < abs(lhs[i] - rhs[i])) return false;
     }
@@ -173,7 +173,7 @@ bool isApprox (const Vector<N>& lhs, const Vector<N>& rhs, const double epsilon 
 }
 
 template <unsigned int N>
-bool operator!= (const Vector<N>& lhs, const Vector<N>& rhs) {
+__host__ __device__ bool operator!= (const Vector<N>& lhs, const Vector<N>& rhs) {
     return !(lhs == rhs);
 }
 
@@ -185,7 +185,7 @@ bool operator!= (const Vector<N>& lhs, const Vector<N>& rhs) {
  * @return The normalized vector.
  */
 template <unsigned int N>
-UnitVector<N> normalize (Vector<N> vector) {
+__host__ __device__ UnitVector<N> normalize (Vector<N> vector) {
     return (UnitVector<N>)(vector);
 }
 
@@ -198,7 +198,7 @@ UnitVector<N> normalize (Vector<N> vector) {
  * @return The dot product of the two vectors.
  */
 template <unsigned int N>
-double dot (const Vector<N>& lhs, const Vector<N>& rhs) {
+__host__ __device__ double dot (const Vector<N>& lhs, const Vector<N>& rhs) {
     double dot = 0.0;
     for (int i = 0; i < N; ++i) {
         dot += lhs[i] * rhs[i];
@@ -228,7 +228,7 @@ double dot (const Vector<N>& lhs, const Vector<N>& rhs) {
  * @return The reflected vector.
  */
 template <unsigned int N>
-Vector<N> reflect (const Vector<N>& vector, const UnitVector<N>& surface_normal) {
+__host__ __device__ Vector<N> reflect (const Vector<N>& vector, const UnitVector<N>& surface_normal) {
     return vector - 2 * dot(vector, surface_normal) * surface_normal;
 }
 
@@ -242,7 +242,7 @@ Vector<N> reflect (const Vector<N>& vector, const UnitVector<N>& surface_normal)
  * @return The refracted vector.
  */
 template <unsigned int N>
-Vector<N> refract (const UnitVector<N>& vector, const UnitVector<N>& surface_normal, const double refractive_index) {
+__host__ __device__ Vector<N> refract (const UnitVector<N>& vector, const UnitVector<N>& surface_normal, const double refractive_index) {
     double cos_theta = dot(-1 * vector, surface_normal);
     Vector<3> normal_orthogonal = refractive_index * (vector + cos_theta * surface_normal);
     Vector<3> normal_parallel = -1 * sqrt(abs(1 - normal_orthogonal.length_squared())) * surface_normal;
@@ -254,19 +254,19 @@ class UnitVector: public Vector<N> {
 
     public:
 
-        UnitVector (const Vector<N>& vector) {
+        __host__ __device__ UnitVector (const Vector<N>& vector) {
             Vector<N> unit = vector / vector.length();
             for (int i = 0; i < N; ++i) {
                 (*this)[i] = unit[i];
             }
         }
 
-        UnitVector (const double (&values)[N]) {
+        __host__ __device__ UnitVector (const double (&values)[N]) {
             Vector<N> vector { values };
             *this = { vector };
         }
 
-        UnitVector () {
+        __host__ __device__ UnitVector () {
             *this = {{ 1.0, 0.0, 0.0 }};
         }
 };

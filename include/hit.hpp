@@ -15,8 +15,8 @@ class Hit {
         UnitVector<3> surface_normal; // The normal of the surface that was hit.
         bool is_front; // True if the hit occurred on the front of the surface.
 
-        Hit ();
-        Hit (
+        __host__ __device__ Hit ();
+        __host__ __device__ Hit (
             const Ray& incoming,
             const double distance,
             const Point& origin,

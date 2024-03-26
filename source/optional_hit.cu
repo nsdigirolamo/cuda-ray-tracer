@@ -1,10 +1,10 @@
 #include "optional_hit.hpp"
 
-OptionalHit::OptionalHit (const Hit& hit)
+__host__ __device__ OptionalHit::OptionalHit (const Hit& hit)
     : exists(true)
     , hit(hit)
 { }
 
-OptionalHit::OptionalHit ()
+__host__ __device__ OptionalHit::OptionalHit ()
     : exists(false)
 { }

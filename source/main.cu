@@ -9,13 +9,13 @@
 
 int main () {
 
-    /**
-
     Sphere* host_sphere = new Sphere(
         {{ 0, 0, 0 }},
         1,
         new Diffuse(ANTIQUEWHITE)
     );
+
+    /**
 
     Sphere* device_sphere;
     cudaMalloc(&device_sphere, sizeof(Sphere));

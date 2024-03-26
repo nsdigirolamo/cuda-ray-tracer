@@ -27,13 +27,13 @@ $(ODIR)/%.cpp.o: $(SDIR)/%.cpp $(HDRS) | $(ODIR)
 	$(NVCC) $(NVCCFLAGS) -c $< -o $@
 
 $(ODIR)/%.cu.o: $(SDIR)/%.cu $(HDRS) | $(ODIR)
-	$(NVCC) $(NVCCFLAGS) -c $< -o $@
+	$(NVCC) $(NVCCFLAGS) --device-c $< -o $@
 
 $(ODIR)/%.cpp.o: $(TDIR)/%.cpp $(HDRS) | $(ODIR)
 	$(NVCC) $(NVCCFLAGS) -c $< -o $@
 
 $(ODIR)/%.cu.o: $(TDIR)/%.cu $(HDRS) | $(ODIR)
-	$(NVCC) $(NVCCFLAGS) -c $< -o $@
+	$(NVCC) $(NVCCFLAGS) --device-c $< -o $@
 
 $(ODIR):
 	mkdir -p $@
