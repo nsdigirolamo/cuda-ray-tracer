@@ -1,6 +1,8 @@
 #ifndef IMAGE_HPP
 #define IMAGE_HPP
 
+#include <string>
+
 #include "color.hpp"
 
 class Image {
@@ -32,6 +34,13 @@ class Image {
          * @param pixel The pixel's new color.
          */
         void setPixel(const int row, const int col, const Color& pixel);
+
+        /**
+         * @brief Write the contents of the image to a ppm file.
+         *
+         * @param file_name The file's name.
+         */
+        void writeToFile (const std::string file_name) const;
 };
 
 #endif
