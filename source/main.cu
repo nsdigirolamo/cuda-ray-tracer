@@ -4,7 +4,7 @@
 
 #include "materials/diffuse.hpp"
 
-#include "camera.cuh"
+#include "camera.hpp"
 #include "image.hpp"
 
 int main () {

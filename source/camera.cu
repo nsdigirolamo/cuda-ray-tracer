@@ -1,4 +1,4 @@
-#include "camera.cuh"
+#include "camera.hpp"
 
 Camera::Camera(
     const Point& origin,
