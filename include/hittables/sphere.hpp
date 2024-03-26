@@ -13,11 +13,11 @@ class Sphere : public Hittable {
 
     public:
 
-        Sphere (const Point& origin, double radius, Material* material);
+        __host__ Sphere(const Point& origin, const double radius, Material* material);
         ~Sphere ();
 
-        OptionalHit checkHit (const Ray& ray) const;
-        Material* getMaterial ();
+        __host__ __device__ OptionalHit checkHit (const Ray& ray) const;
+        __host__ __device__ Material* getMaterial ();
 };
 
 #endif

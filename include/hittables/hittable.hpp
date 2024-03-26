@@ -12,8 +12,8 @@ class Hittable {
 
         virtual ~Hittable () { };
 
-        virtual OptionalHit checkHit (const Ray& ray) const = 0;
-        virtual Material* getMaterial () = 0;
+        __host__ __device__ virtual OptionalHit checkHit (const Ray& ray) const = 0;
+        __host__ __device__ virtual Material* getMaterial () = 0;
 };
 
 #endif
