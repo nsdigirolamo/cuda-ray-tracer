@@ -1,9 +1,6 @@
 #ifndef VECTOR_HPP
 #define VECTOR_HPP
 
-#include "cuda.h"
-#include "math.h"
-
 template <unsigned int N>
 class UnitVector;
 

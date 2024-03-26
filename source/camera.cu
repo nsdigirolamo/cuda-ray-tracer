@@ -1,9 +1,9 @@
 #include "camera.hpp"
-
-#include "utils/cuda_utils.hpp"
-#include "hittables/sphere.hpp"
+#include "hittables/hittable.hpp"
 #include "hittables/plane.hpp"
+#include "hittables/sphere.hpp"
 #include "materials/diffuse.hpp"
+#include "utils/cuda_utils.hpp"
 
 __device__ Hittable** hittables;
 __device__ int hittables_count;
@@ -112,8 +112,8 @@ __device__ Point Camera::calculatePixelLocation () const {
     int row = blockIdx.y;
     int col = blockIdx.x;
 
-    double y = 0.5 * this->view_height - col * this->pixel_height - 0.5 * this->pixel_height;
-    double x = -0.5 * this->view_width + row * this->pixel_width + 0.5 * this->pixel_width;
+    double x = -0.5 * this->view_width + col * this->pixel_width + 0.5 * this->pixel_width;
+    double y = 0.5 * this->view_height - row * this->pixel_height - 0.5 * this->pixel_height;
 
     /**
      * TODO: Implement random offset.
@@ -187,7 +187,7 @@ __global__ void generateHittables () {
     Sphere* sphere = new Sphere(
         {{ 0, 0, 0 }},
         1,
-        new Diffuse(ANTIQUEWHITE)
+        new Diffuse(FIREBRICK)
     );
 
     Plane* plane = new Plane(

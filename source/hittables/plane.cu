@@ -1,5 +1,4 @@
 #include "hittables/plane.hpp"
-#include "optional_hit.hpp"
 
 __host__ __device__ Plane::Plane (const Point& origin, const UnitVector<3> normal, Material* material)
     : origin(origin)

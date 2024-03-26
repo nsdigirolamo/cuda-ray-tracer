@@ -1,4 +1,3 @@
-#include "assert.h"
 #include "materials/diffuse.hpp"
 
 __host__ __device__ Diffuse::Diffuse (const Color& color)

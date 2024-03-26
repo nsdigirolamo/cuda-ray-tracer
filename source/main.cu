@@ -11,7 +11,7 @@ int main () {
         {{ 0, 0, 0 }}
     };
 
-    Image image = camera.render(50, 50);
+    Image image = camera.render(1, 1);
 
     image.writeToFile("render");
 }

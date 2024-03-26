@@ -1,4 +1,3 @@
-#include "assert.h"
 #include "materials/metallic.hpp"
 
 __host__ __device__ Metallic::Metallic (const Color& color, const double blur)
