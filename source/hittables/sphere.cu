@@ -11,7 +11,7 @@ Sphere::~Sphere () {
     this->material = NULL;
 }
 
-OptionalHit Sphere::checkHit (const Ray& ray) const {
+__host__ __device__ OptionalHit Sphere::checkHit (const Ray& ray) const {
 
     OptionalHit opt;
 
@@ -57,6 +57,6 @@ OptionalHit Sphere::checkHit (const Ray& ray) const {
     return opt;
 }
 
-Material* Sphere::getMaterial () {
+__host__ __device__ Material* Sphere::getMaterial () {
     return this->material;
 }

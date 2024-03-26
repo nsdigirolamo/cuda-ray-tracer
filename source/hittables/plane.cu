@@ -12,7 +12,7 @@ Plane::~Plane () {
     this->material = NULL;
 }
 
-OptionalHit Plane::checkHit (const Ray& ray) const {
+__host__ __device__ OptionalHit Plane::checkHit (const Ray& ray) const {
 
     OptionalHit opt;
 
@@ -42,6 +42,6 @@ OptionalHit Plane::checkHit (const Ray& ray) const {
     return opt;
 }
 
-Material* Plane::getMaterial () {
+__host__ __device__ Material* Plane::getMaterial () {
     return this->material;
 }
