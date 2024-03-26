@@ -213,7 +213,7 @@ double dot (const Vector<N>& lhs, const Vector<N>& rhs) {
  * @param rhs The vector on the right hand side of the operation. Must be a 3D vector.
  */
 #define CROSS(lhs, rhs) \
-    (Vector<3>){{ \
+    {{ \
         lhs[1] * rhs[2] - lhs[2] * rhs[1], \
         lhs[2] * rhs[0] - lhs[0] * rhs[2], \
         lhs[0] * rhs[1] - lhs[1] * rhs[0], \
