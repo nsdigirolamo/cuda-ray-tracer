@@ -7,8 +7,8 @@ class Ray {
 
     public:
 
-        const Point origin;
-        const UnitVector<3> direction;
+        Point origin;
+        UnitVector<3> direction;
 };
 
 #endif

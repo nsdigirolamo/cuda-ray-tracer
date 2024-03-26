@@ -7,8 +7,8 @@ class OptionalHit {
 
     public:
 
-        const bool exists;
-        const Hit hit;
+        bool exists;
+        Hit hit;
 
         OptionalHit ();
         OptionalHit (const Hit& hit);

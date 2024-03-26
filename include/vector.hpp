@@ -1,6 +1,7 @@
 #ifndef VECTOR_HPP
 #define VECTOR_HPP
 
+#include "cuda.h"
 #include "math.h"
 
 template <unsigned int N>
@@ -88,7 +89,7 @@ class Vector {
          * @return The vector's direction as a unit vector.
          */
         UnitVector<N> direction () const {
-            return (UnitVector<3>)(*this);
+            return (*this) / this->length();
         }
 };
 
