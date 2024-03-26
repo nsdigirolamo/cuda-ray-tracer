@@ -6,14 +6,14 @@ ODIR := obj
 NVCC := nvcc
 NVCCFLAGS := -std=c++17 -I $(IDIR)
 
-SRCS := $(shell find $(SDIR) -name '*.cpp' -or -name '*.cu')
+SRCS := $(shell find $(SDIR) -name '*.cu')
 OBJS := $(SRCS:$(SDIR)/%=$(ODIR)/%.o)
 
-TSRCS := $(shell find $(TDIR) $(SDIR) \( -name '*.cpp' -and \! -name 'main.cpp' \) -or -name '*.cu')
+TSRCS := $(shell find $(TDIR) $(SDIR) -name '*.cu' -and \! -name 'main.cu' )
 TOBJS := $(TSRCS:$(TDIR)/%=$(ODIR)/%.o)
 TOBJS := $(TSRCS:$(SDIR)/%=$(ODIR)/%.o)
 
-HDRS := $(shell find $(IDIR) -name '*.hpp' -or -name '*.cuh')
+HDRS := $(shell find $(IDIR) -name '*.hpp')
 
 .PHONY: clean
 
