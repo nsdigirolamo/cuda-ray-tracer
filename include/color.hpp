@@ -10,11 +10,11 @@ class Color : public Vector<3> {
 
     public:
 
-        Color ();
-        Color (const double (&values)[3]);
-        Color (const Vector<3>& vector);
-        Color (const double red, const double green, const double blue);
-        Color (const int rgb_hex_value);
+        __host__ __device__ Color ();
+        __host__ __device__ Color (const double (&values)[3]);
+        __host__ __device__ Color (const Vector<3>& vector);
+        __host__ __device__ Color (const double red, const double green, const double blue);
+        __host__ __device__ Color (const int rgb_hex_value);
 };
 
 #define SKY SKYBLUE
