@@ -1,7 +1,7 @@
 #include "hittables/sphere.hpp"
 #include "lib/doctest/doctest.hpp"
 #include "materials/diffuse.hpp"
-#include "test_utils.hpp"
+#include "utils/test_utils.hpp"
 
 TEST_SUITE ("Sphere Hit Tests") {
 

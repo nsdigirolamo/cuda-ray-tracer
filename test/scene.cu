@@ -2,7 +2,7 @@
 #include "scene.hpp"
 #include "hittables/sphere.hpp"
 #include "materials/diffuse.hpp"
-#include "test_utils.hpp"
+#include "utils/test_utils.hpp"
 
 TEST_SUITE ("Initialization Tests") {
 

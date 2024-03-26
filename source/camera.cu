@@ -1,6 +1,6 @@
 #include "camera.hpp"
 
-#include "cuda_error_handling.hpp"
+#include "utils/cuda_utils.hpp"
 #include "hittables/sphere.hpp"
 #include "hittables/plane.hpp"
 #include "materials/diffuse.hpp"

@@ -1,6 +1,6 @@
 #include "image.hpp"
 #include "lib/doctest/doctest.hpp"
-#include "test_utils.hpp"
+#include "utils/test_utils.hpp"
 
 TEST_SUITE ("Initialization Tests") {
 
