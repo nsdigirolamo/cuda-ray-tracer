@@ -72,18 +72,16 @@ class Camera {
         __device__ Ray getInitialRay () const;
 
         Image render (
-            Hittable** hittables,
-            const int hittable_count,
             const int samples_per_pixel,
             const int bounces_per_sample
         ) const;
 };
 
+__global__ void generateHittables ();
+
 __global__ void traceSample (
     Camera camera,
     Color* samples,
-    Hittable** hittables,
-    const int hittable_count,
     const int bounces_per_sample
 );
 

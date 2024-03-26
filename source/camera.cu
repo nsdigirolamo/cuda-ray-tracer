@@ -1,5 +1,13 @@
 #include "camera.hpp"
 
+#include "cuda_error_handling.hpp"
+#include "hittables/sphere.hpp"
+#include "hittables/plane.hpp"
+#include "materials/diffuse.hpp"
+
+__device__ Hittable** hittables;
+__device__ int hittables_count;
+
 Camera::Camera(
     const Point& origin,
     const int image_height,
@@ -130,8 +138,6 @@ __device__ Ray Camera::getInitialRay () const {
 }
 
 Image Camera::render (
-    Hittable** hittables,
-    const int hittable_count,
     const int samples_per_pixel,
     const int bounces_per_sample
 ) const {
@@ -140,15 +146,17 @@ Image Camera::render (
 
     Color* samples;
     size_t samples_size = sizeof(Color) * this->image_width * this->image_height * samples_per_pixel;
-    cudaMalloc(&samples, samples_size);
+    CUDA_ERROR_CHECK( cudaMalloc(&samples, samples_size) );
 
     dim3 trace_grid_dims(this->image_width, this->image_height);
     dim3 trace_block_dims(samples_per_pixel);
 
+    generateHittables<<<1, 1>>>();
+
     // Trace each sample.
 
-    traceSample<<<trace_grid_dims, trace_block_dims>>>(*this, samples, hittables, hittable_count, bounces_per_sample);
-    cudaDeviceSynchronize();
+    traceSample<<<trace_grid_dims, trace_block_dims>>>(*this, samples, bounces_per_sample);
+    CUDA_ERROR_CHECK( cudaDeviceSynchronize() );
 
     // Reduce the samples down to a single pixel color.
 
@@ -161,24 +169,43 @@ Image Camera::render (
 
     Color* reduced_samples;
     size_t reduced_samples_size = sizeof(Color) * this->image_width * this->image_height;
-    cudaMalloc(&reduced_samples, reduced_samples_size);
+    CUDA_ERROR_CHECK( cudaMalloc(&reduced_samples, reduced_samples_size) );
 
     reduceSamples<<<reduce_grid_dims, reduce_block_dims>>>(samples, this->image_height, this->image_width, reduced_samples, samples_per_pixel);
-    cudaDeviceSynchronize();
+    CUDA_ERROR_CHECK( cudaDeviceSynchronize() );
 
     // Copy the reduced pixels to host memory and return.
 
     Image image { this->image_height, this->image_width };
-    cudaMemcpy(image.pixels, reduced_samples, reduced_samples_size, cudaMemcpyDeviceToHost);
+    CUDA_ERROR_CHECK( cudaMemcpy(image.pixels, reduced_samples, reduced_samples_size, cudaMemcpyDeviceToHost) );
 
     return image;
+}
+
+__global__ void generateHittables () {
+
+    Sphere* sphere = new Sphere(
+        {{ 0, 0, 0 }},
+        1,
+        new Diffuse(ANTIQUEWHITE)
+    );
+
+    Plane* plane = new Plane(
+        {{ 0, -1, 0 }},
+        {{ 0, 1, 0 }},
+        new Diffuse(ANTIQUEWHITE)
+    );
+
+    hittables_count = 2;
+    hittables = (Hittable**)(malloc(sizeof(Hittable*) * hittables_count));
+
+    hittables[0] = sphere;
+    hittables[1] = plane;
 }
 
 __global__ void traceSample (
     Camera camera,
     Color* samples,
-    Hittable** hittables,
-    const int hittable_count,
     const int bounces_per_sample
 ) {
 
@@ -190,8 +217,7 @@ __global__ void traceSample (
     int depth = threadIdx.x;
 
     Ray ray = camera.getInitialRay();
-    // Color traced { 1.0, 1.0, 1.0 };
-    Color traced;
+    Color traced { 1.0, 1.0, 1.0 };
 
     int bounce = 0;
 
@@ -200,7 +226,7 @@ __global__ void traceSample (
         OptionalHit closest;
         Hittable* hittable = NULL;
 
-        for (int i = 0; i < hittable_count; ++i) {
+        for (int i = 0; i < hittables_count; ++i) {
 
             OptionalHit opt = hittables[i]->checkHit(ray);
 
