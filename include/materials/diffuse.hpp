@@ -13,8 +13,8 @@ class Diffuse : public Material {
 
         Diffuse (const Color& color);
 
-        Color getColor () const;
-        Ray scatter (const Hit& hit) const;
+        __host__ __device__ Color getColor () const;
+        __host__ __device__ Ray scatter (const Hit& hit) const;
 };
 
 #endif

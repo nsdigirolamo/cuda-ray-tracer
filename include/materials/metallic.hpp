@@ -14,9 +14,9 @@ class Metallic : public Material {
 
         Metallic (const Color& color, const double blur);
 
-        Color getColor () const;
-        double getBlur () const;
-        Ray scatter (const Hit& hit) const;
+        __host__ __device__ Color getColor () const;
+        __host__ __device__ double getBlur () const;
+        __host__ __device__ Ray scatter (const Hit& hit) const;
 };
 
 #endif

@@ -5,11 +5,11 @@ Diffuse::Diffuse (const Color& color)
     : color(color)
 { }
 
-Color Diffuse::getColor () const {
+__host__ __device__ Color Diffuse::getColor () const {
     return this->color;
 }
 
-Ray Diffuse::scatter (const Hit& hit) const {
+__host__ __device__ Ray Diffuse::scatter (const Hit& hit) const {
 
     /**
      * TODO: Implement random offset

@@ -6,15 +6,15 @@ Metallic::Metallic (const Color& color, const double blur)
     , blur(blur)
 { }
 
-Color Metallic::getColor () const {
+__host__ __device__ Color Metallic::getColor () const {
     return this->color;
 }
 
-double Metallic::getBlur () const {
+__host__ __device__ double Metallic::getBlur () const {
     return this->blur;
 }
 
-Ray Metallic::scatter (const Hit& hit) const {
+__host__ __device__ Ray Metallic::scatter (const Hit& hit) const {
 
     /**
      * TODO: Implement random offset with blur

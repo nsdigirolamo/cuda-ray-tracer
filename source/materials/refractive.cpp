@@ -5,15 +5,15 @@ Refractive::Refractive (const Color& color, const double refractive_index)
     , refractive_index(refractive_index)
 { }
 
-Color Refractive::getColor () const {
+__host__ __device__ Color Refractive::getColor () const {
     return this->color;
 }
 
-double Refractive::getRefIdx () const {
+__host__ __device__ double Refractive::getRefIdx () const {
     return this->refractive_index;
 }
 
-Ray Refractive::scatter (const Hit& hit) const {
+__host__ __device__ Ray Refractive::scatter (const Hit& hit) const {
 
     double ref_idx = this->refractive_index;
 
