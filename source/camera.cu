@@ -225,7 +225,7 @@ __global__ void traceSample (
 
         } else {
 
-            traced = hadamard(traced, SKY);
+            traced = hadamard(traced, (Color)(SKY));
             break;
         }
 
