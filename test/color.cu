@@ -48,7 +48,9 @@ TEST_SUITE ("Initialization Tests") {
 
     TEST_CASE ("Initialization with hex value should make color have appropriate values.") {
 
-        Color expected_beige = {{245.0 / 256, 245.0 / 256, 220.0 / 256}};
-        CHECK_VECTORS(expected_beige, BEIGE);
+        Color actual_beige { BEIGE };
+        Color expected_beige {{245.0 / 256, 245.0 / 256, 220.0 / 256}};
+
+        CHECK_VECTORS(actual_beige, expected_beige);
     }
 }
