@@ -12,7 +12,7 @@ class Metallic : public Material {
 
     public:
 
-        Metallic (const Color& color, const double blur);
+        __host__ __device__ Metallic (const Color& color, const double blur);
 
         __host__ __device__ Color getColor () const;
         __host__ __device__ double getBlur () const;

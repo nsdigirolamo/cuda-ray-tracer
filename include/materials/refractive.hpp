@@ -12,7 +12,7 @@ class Refractive : public Material {
 
     public:
 
-        Refractive (const Color& color, const double refractive_index);
+        __host__ __device__ Refractive (const Color& color, const double refractive_index);
 
         __host__ __device__ Color getColor () const;
         __host__ __device__ double getRefIdx () const;

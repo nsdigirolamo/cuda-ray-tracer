@@ -10,7 +10,7 @@ class Hittable {
 
     public:
 
-        virtual ~Hittable () { };
+        __host__ __device__ virtual ~Hittable () { };
 
         __host__ __device__ virtual OptionalHit checkHit (const Ray& ray) const = 0;
         __host__ __device__ virtual Material* getMaterial () = 0;

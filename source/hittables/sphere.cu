@@ -1,12 +1,12 @@
 #include "hittables/sphere.hpp"
 
-Sphere::Sphere (const Point& origin, double radius, Material* material)
+__host__ __device__ Sphere::Sphere (const Point& origin, double radius, Material* material)
     : origin(origin)
     , radius(radius)
     , material(material)
 { }
 
-Sphere::~Sphere () {
+__host__ __device__ Sphere::~Sphere () {
     delete this->material;
     this->material = NULL;
 }

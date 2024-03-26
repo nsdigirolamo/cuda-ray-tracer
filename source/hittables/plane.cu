@@ -1,13 +1,13 @@
 #include "hittables/plane.hpp"
 #include "optional_hit.hpp"
 
-Plane::Plane (const Point& origin, const UnitVector<3> normal, Material* material)
+__host__ __device__ Plane::Plane (const Point& origin, const UnitVector<3> normal, Material* material)
     : origin(origin)
     , normal(normal)
     , material(material)
 { }
 
-Plane::~Plane () {
+__host__ __device__ Plane::~Plane () {
     delete this->material;
     this->material = NULL;
 }

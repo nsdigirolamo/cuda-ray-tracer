@@ -9,7 +9,7 @@ class Material {
 
     public:
 
-        virtual ~Material () { };
+        __host__ __device__ virtual ~Material () { };
 
         __host__ __device__ virtual Color getColor () const = 0;
         __host__ __device__ virtual Ray scatter (const Hit& hit) const = 0;

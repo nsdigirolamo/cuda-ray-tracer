@@ -1,6 +1,6 @@
 #include "materials/refractive.hpp"
 
-Refractive::Refractive (const Color& color, const double refractive_index)
+__host__ __device__ Refractive::Refractive (const Color& color, const double refractive_index)
     : color(color)
     , refractive_index(refractive_index)
 { }

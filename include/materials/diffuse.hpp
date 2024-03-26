@@ -11,7 +11,7 @@ class Diffuse : public Material {
 
     public:
 
-        Diffuse (const Color& color);
+        __host__ __device__ Diffuse (const Color& color);
 
         __host__ __device__ Color getColor () const;
         __host__ __device__ Ray scatter (const Hit& hit) const;
