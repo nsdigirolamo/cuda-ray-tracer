@@ -1,9 +1,16 @@
+#include "curand_kernel.h"
+
 #include "camera.hpp"
 #include "hittables/hittable.hpp"
 #include "hittables/plane.hpp"
 #include "hittables/sphere.hpp"
 #include "materials/diffuse.hpp"
 #include "utils/cuda_utils.hpp"
+#include "utils/rand_utils.hpp"
+
+#include <iostream>
+#include <cuda.h>
+#include <cuda_runtime.h>
 
 __device__ Hittable** hittables;
 __device__ int hittables_count;
@@ -142,20 +149,37 @@ Image Camera::render (
     const int bounces_per_sample
 ) const {
 
-    // Allocate space to record samples.
+    int pixel_count = this->image_width * this->image_height;
+    int sample_count = pixel_count * samples_per_pixel;
+
+    // Allocate space for hittables and create them as needed.
+
+    setupHittables<<<1, 1>>>();
+    CUDA_ERROR_CHECK( cudaDeviceSynchronize() );
+
+    // Allocate space for pixel samples.
 
     Color* samples;
-    size_t samples_size = sizeof(Color) * this->image_width * this->image_height * samples_per_pixel;
+    size_t samples_size = sizeof(Color) * sample_count;
     CUDA_ERROR_CHECK( cudaMalloc(&samples, samples_size) );
+
+    // Allocate space for and setup the device's random states.
+
+    curandState* device_states;
+
+    dim3 rand_grid_dims(this->image_width, this->image_height);
+    dim3 rand_block_dims(1);
+
+    CUDA_ERROR_CHECK( cudaMalloc(&device_states, sizeof(curandState) * pixel_count) );
+    setupRandoms<<<rand_grid_dims, rand_block_dims>>>(device_states, time(NULL));
+    CUDA_ERROR_CHECK( cudaDeviceSynchronize() );
+
+    // Trace each sample.
 
     dim3 trace_grid_dims(this->image_width, this->image_height);
     dim3 trace_block_dims(samples_per_pixel);
 
-    generateHittables<<<1, 1>>>();
-
-    // Trace each sample.
-
-    traceSample<<<trace_grid_dims, trace_block_dims>>>(*this, samples, bounces_per_sample);
+    traceSample<<<trace_grid_dims, trace_block_dims>>>(*this, samples, bounces_per_sample, device_states);
     CUDA_ERROR_CHECK( cudaDeviceSynchronize() );
 
     // Reduce the samples down to a single pixel color.
@@ -182,7 +206,7 @@ Image Camera::render (
     return image;
 }
 
-__global__ void generateHittables () {
+__global__ void setupHittables () {
 
     Sphere* sphere = new Sphere(
         {{ 0, 0, 0 }},
@@ -193,7 +217,7 @@ __global__ void generateHittables () {
     Plane* plane = new Plane(
         {{ 0, -1, 0 }},
         {{ 0, 1, 0 }},
-        new Diffuse(ANTIQUEWHITE)
+        new Diffuse(SLATEGRAY)
     );
 
     hittables_count = 2;
@@ -203,10 +227,23 @@ __global__ void generateHittables () {
     hittables[1] = plane;
 }
 
+__global__ void setupRandoms (curandState* device_states, uint64_t seed) {
+
+    int width = gridDim.x;
+
+    int row = blockIdx.y;
+    int col = blockIdx.x;
+
+    int thread_id = (row * width) + col;
+
+    curand_init(seed, thread_id, 0, &(device_states[0]));
+}
+
 __global__ void traceSample (
     Camera camera,
     Color* samples,
-    const int bounces_per_sample
+    const int bounces_per_sample,
+    curandState* device_states
 ) {
 
     int height = gridDim.y;
@@ -215,6 +252,8 @@ __global__ void traceSample (
     int row = blockIdx.y;
     int col = blockIdx.x;
     int depth = threadIdx.x;
+
+    curandState local_state = device_states[(row * width) + col];
 
     Ray ray = camera.getInitialRay();
     Color traced { 1.0, 1.0, 1.0 };
@@ -247,7 +286,7 @@ __global__ void traceSample (
             Material* material = hittable->getMaterial();
 
             traced = hadamard(traced, material->getColor());
-            ray = material->scatter(hit);
+            ray = material->scatter(hit, &local_state);
 
         } else {
 

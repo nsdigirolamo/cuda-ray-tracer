@@ -1,6 +1,9 @@
 #ifndef CAMERA_HPP
 #define CAMERA_HPP
 
+#include "curand_kernel.h"
+#include "stdint.h"
+
 #include "image.hpp"
 #include "ray.hpp"
 
@@ -101,7 +104,16 @@ class Camera {
  *
  * @return __global__
  */
-__global__ void generateHittables ();
+__global__ void setupHittables ();
+
+/**
+ * @brief Allocates space for and generates the device's random states. Should
+ * be launched with the same dimensions as traceSample.
+ *
+ * @param device_states Device allocated storage for the generated states.
+ * @param seed The seed to be used for random number generation.
+ */
+__global__ void setupRandoms (curandState* device_states, uint64_t seed);
 
 /**
  * @brief Traces a sample in the scene. Each sample should have its own thread.
@@ -115,7 +127,8 @@ __global__ void generateHittables ();
 __global__ void traceSample (
     Camera camera,
     Color* samples,
-    const int bounces_per_sample
+    const int bounces_per_sample,
+    curandState* device_states
 );
 
 /**
