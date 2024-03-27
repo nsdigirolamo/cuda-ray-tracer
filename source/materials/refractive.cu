@@ -13,7 +13,7 @@ __host__ __device__ double Refractive::getRefIdx () const {
     return this->refractive_index;
 }
 
-__host__ __device__ Ray Refractive::scatter (const Hit& hit) const {
+__device__ Ray Refractive::scatter (const Hit& hit, curandState* state) const {
 
     double ref_idx = this->refractive_index;
 

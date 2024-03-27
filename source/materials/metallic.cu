@@ -13,7 +13,7 @@ __host__ __device__ double Metallic::getBlur () const {
     return this->blur;
 }
 
-__host__ __device__ Ray Metallic::scatter (const Hit& hit) const {
+__device__ Ray Metallic::scatter (const Hit& hit, curandState* state) const {
 
     /**
      * TODO: Implement random offset with blur
