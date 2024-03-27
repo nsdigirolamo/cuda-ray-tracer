@@ -39,6 +39,7 @@ $(ODIR):
 	mkdir -p $@
 	mkdir -p $@/hittables
 	mkdir -p $@/materials
+	mkdir -p $@/utils
 
 clean:
 	rm -rf $(ODIR) a.out testing tracing *.ppm valgrind-out.* vgcore.*
