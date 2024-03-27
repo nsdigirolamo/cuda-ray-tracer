@@ -1,4 +1,5 @@
 #include "materials/metallic.hpp"
+#include "utils/rand_utils.hpp"
 
 __host__ __device__ Metallic::Metallic (const Color& color, const double blur)
     : color(color)
@@ -15,18 +16,8 @@ __host__ __device__ double Metallic::getBlur () const {
 
 __device__ Ray Metallic::scatter (const Hit& hit, curandState* state) const {
 
-    /**
-     * TODO: Implement random offset with blur
-     *
-     *   return {
-     *       hit.origin,
-     *       reflect(hit.incoming.direction, hit.surface_normal)
-     *   };
-     *
-     */
-
     return {
         hit.origin,
-        reflect(hit.incoming.direction, hit.surface_normal)
+        reflect(hit.incoming.direction, hit.surface_normal) + (this->blur * randomOnUnitSphere(state))
     };
 }

@@ -13,6 +13,6 @@ __device__ Ray Diffuse::scatter (const Hit& hit, curandState* state) const {
 
     return {
         hit.origin,
-        hit.surface_normal
+        hit.surface_normal + randomOnUnitSphere(state)
     };
 }
