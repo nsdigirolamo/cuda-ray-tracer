@@ -16,7 +16,7 @@ class Metallic : public Material {
 
         __host__ __device__ Color getColor () const;
         __host__ __device__ double getBlur () const;
-        __host__ __device__ Ray scatter (const Hit& hit) const;
+        __device__ Ray scatter (const Hit& hit, curandState* state) const;
 };
 
 #endif
