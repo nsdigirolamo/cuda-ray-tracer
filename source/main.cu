@@ -1,7 +1,12 @@
+#include "time.h"
+#include <iostream>
+
 #include "camera.hpp"
 #include "image.hpp"
 
 int main () {
+
+    clock_t start = clock();
 
     Camera camera {
         {{ 0, 0, -5 }},
@@ -14,4 +19,8 @@ int main () {
     Image image = camera.render(50, 50);
 
     image.writeToFile("render");
+
+    clock_t end = clock();
+
+    std::cout << "Completed in " << (end - start) / 1000000.0 << " seconds.\n";
 }
