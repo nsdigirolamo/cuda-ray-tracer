@@ -5,12 +5,15 @@
 #include "hittables/plane.hpp"
 #include "hittables/sphere.hpp"
 #include "materials/diffuse.hpp"
+#include "materials/metallic.hpp"
 #include "utils/cuda_utils.hpp"
 #include "utils/rand_utils.hpp"
 
 #include <iostream>
 #include <cuda.h>
 #include <cuda_runtime.h>
+
+#define BLOCK_DIM 16
 
 __device__ Hittable** hittables;
 __device__ int hittables_count;
@@ -114,22 +117,17 @@ __device__ Point Camera::generateRayOrigin () const {
     return this->origin;
 }
 
-__device__ Point Camera::calculatePixelLocation () const {
+__device__ Point Camera::calculatePixelLocation (curandState* state) const {
 
-    int row = blockIdx.y;
-    int col = blockIdx.x;
+    int row = (blockDim.y * blockIdx.y) + threadIdx.y;
+    int col = (blockDim.x * blockIdx.x) + threadIdx.x;
 
     double x = -0.5 * this->view_width + col * this->pixel_width + 0.5 * this->pixel_width;
     double y = 0.5 * this->view_height - row * this->pixel_height - 0.5 * this->pixel_height;
 
-    /**
-     * TODO: Implement random offset.
-     *
-     * Vector<2> offset = randomInUnitCircle();
-     * x += offset[0] * this->pixel_width;
-     * y += offset[1] * this->pixel_height;
-     *
-     */
+    Vector<2> offset = randomInUnitCircle(state);
+    x += offset[0] * this->pixel_width;
+    y += offset[1] * this->pixel_height;
 
     return
         this->view_left * x +
@@ -137,73 +135,81 @@ __device__ Point Camera::calculatePixelLocation () const {
         this->view_direction * this->focal_distance;
 }
 
-__device__ Ray Camera::getInitialRay () const {
+__device__ Ray Camera::getInitialRay (curandState* state) const {
 
     Point origin = this->generateRayOrigin();
-    UnitVector<3> direction = this->calculatePixelLocation() - this->origin;
+    UnitVector<3> direction = this->calculatePixelLocation(state) - this->origin;
     return { origin, direction };
 }
 
-Image Camera::render (
-    const int samples_per_pixel,
-    const int bounces_per_sample
-) const {
+Image Camera::render (const int sample_count, const int max_bounces) const {
 
-    int pixel_count = this->image_width * this->image_height;
-    int sample_count = pixel_count * samples_per_pixel;
+    cudaError_t e = cudaGetLastError();
+    CUDA_ERROR_CHECK(e);
 
-    // Allocate space for hittables and create them as needed.
+    int dim = BLOCK_DIM;
+
+    dim3 block_dims(dim, dim);
+
+    dim3 grid_dims(
+        (this->image_width + dim - 1) / dim,
+        (this->image_height + dim - 1) / dim
+    );
+
+    // Allocate space for hittables.
 
     setupHittables<<<1, 1>>>();
+    e = cudaGetLastError();
+    CUDA_ERROR_CHECK(e);
     CUDA_ERROR_CHECK( cudaDeviceSynchronize() );
 
-    // Allocate space for pixel samples.
+    // Allocate space for image and initialize its pixels.
 
-    Color* samples;
-    size_t samples_size = sizeof(Color) * sample_count;
-    CUDA_ERROR_CHECK( cudaMalloc(&samples, samples_size) );
+    Color* device_image;
+    size_t device_image_size = sizeof(Color) * this->image_width * this->image_height;
+    CUDA_ERROR_CHECK( cudaMalloc(&device_image, device_image_size) );
 
-    // Allocate space for and setup the device's random states.
-
-    curandState* device_states;
-
-    dim3 rand_grid_dims(this->image_width, this->image_height);
-    dim3 rand_block_dims(1);
-
-    CUDA_ERROR_CHECK( cudaMalloc(&device_states, sizeof(curandState) * pixel_count) );
-    setupRandoms<<<rand_grid_dims, rand_block_dims>>>(device_states, time(NULL));
+    setupImage<<<grid_dims, block_dims>>>(*this, device_image);
+    e = cudaGetLastError();
+    CUDA_ERROR_CHECK(e);
     CUDA_ERROR_CHECK( cudaDeviceSynchronize() );
 
-    // Trace each sample.
+    // Allocate space for random states and then initialize them.
 
-    dim3 trace_grid_dims(this->image_width, this->image_height);
-    dim3 trace_block_dims(samples_per_pixel);
+    curandState* states;
+    size_t states_size = sizeof(curandState) * this->image_width * this->image_height;
+    CUDA_ERROR_CHECK( cudaMalloc(&states, states_size) );
 
-    traceSample<<<trace_grid_dims, trace_block_dims>>>(*this, samples, bounces_per_sample, device_states);
+    setupRandStates<<<grid_dims, block_dims>>>(*this, states, time(NULL));
+    e = cudaGetLastError();
+    CUDA_ERROR_CHECK(e);
     CUDA_ERROR_CHECK( cudaDeviceSynchronize() );
 
-    // Reduce the samples down to a single pixel color.
+    // Trace samples.
 
-    int reduce_size = 32;
-    dim3 reduce_grid_dims(
-        (this->image_width + reduce_size - 1) / reduce_size,
-        (this->image_height + reduce_size - 1) / reduce_size
-    );
-    dim3 reduce_block_dims(reduce_size, reduce_size);
+    for (int sample = 0; sample < sample_count; ++sample) {
 
-    Color* reduced_samples;
-    size_t reduced_samples_size = sizeof(Color) * this->image_width * this->image_height;
-    CUDA_ERROR_CHECK( cudaMalloc(&reduced_samples, reduced_samples_size) );
+        traceSamples<<<grid_dims, block_dims>>>(*this, device_image, states, max_bounces);
+        e = cudaGetLastError();
+        CUDA_ERROR_CHECK(e);
+        CUDA_ERROR_CHECK( cudaDeviceSynchronize() );
 
-    reduceSamples<<<reduce_grid_dims, reduce_block_dims>>>(samples, this->image_height, this->image_width, reduced_samples, samples_per_pixel);
+        std::cout << "Completed sample #" << sample + 1 << "\n";
+    }
+
+    // Divide the traced samples to average them out.
+
+    divideSamples<<<grid_dims, block_dims>>>(*this, device_image, sample_count);
+    e = cudaGetLastError();
+    CUDA_ERROR_CHECK(e);
     CUDA_ERROR_CHECK( cudaDeviceSynchronize() );
 
-    // Copy the reduced pixels to host memory and return.
+    // Copy device image over to a host memory.
 
-    Image image { this->image_height, this->image_width };
-    CUDA_ERROR_CHECK( cudaMemcpy(image.pixels, reduced_samples, reduced_samples_size, cudaMemcpyDeviceToHost) );
+    Image host_image { this->image_height, this->image_width };
+    CUDA_ERROR_CHECK( cudaMemcpy(host_image.pixels, device_image, device_image_size, cudaMemcpyDeviceToHost) );
 
-    return image;
+    return host_image;
 }
 
 __global__ void setupHittables () {
@@ -227,40 +233,51 @@ __global__ void setupHittables () {
     hittables[1] = plane;
 }
 
-__global__ void setupRandoms (curandState* device_states, uint64_t seed) {
+__global__ void setupRandStates (Camera camera, curandState* states, uint64_t seed) {
 
-    int width = gridDim.x;
+    int height = camera.getImageHeight();
+    int width = camera.getImageWidth();
+    int row = (blockDim.y * blockIdx.y) + threadIdx.y;
+    int col = (blockDim.x * blockIdx.x) + threadIdx.x;
 
-    int row = blockIdx.y;
-    int col = blockIdx.x;
+    int thread = (row * width) + col;
 
-    int thread_id = (row * width) + col;
-
-    curand_init(seed, thread_id, 0, &(device_states[0]));
+    if (row < height && col < width) {
+        curand_init(seed, thread, 0, &states[thread]);
+    }
 }
 
-__global__ void traceSample (
-    Camera camera,
-    Color* samples,
-    const int bounces_per_sample,
-    curandState* device_states
-) {
+__global__ void setupImage (Camera camera, Color* image) {
 
-    int height = gridDim.y;
-    int width = gridDim.x;
+    int height = camera.getImageHeight();
+    int width = camera.getImageWidth();
+    int row = (blockDim.y * blockIdx.y) + threadIdx.y;
+    int col = (blockDim.x * blockIdx.x) + threadIdx.x;
 
-    int row = blockIdx.y;
-    int col = blockIdx.x;
-    int depth = threadIdx.x;
+    int thread = (row * width) + col;
 
-    curandState local_state = device_states[(row * width) + col];
+    if (row < height && col < width) {
+        image[thread] = {{ 0, 0, 0 }};
+    }
+}
 
-    Ray ray = camera.getInitialRay();
+__global__ void traceSamples (Camera camera, Color* image, curandState* states, int max_bounces) {
+
+    int height = camera.getImageHeight();
+    int width = camera.getImageWidth();
+    int row = (blockDim.y * blockIdx.y) + threadIdx.y;
+    int col = (blockDim.x * blockIdx.x) + threadIdx.x;
+
+    int thread = (row * width) + col;
+
+    if (height <= row || width <= col) return;
+
+    curandState local_state = states[thread];
+
+    Ray ray = camera.getInitialRay(&local_state);
     Color traced { 1.0, 1.0, 1.0 };
 
-    int bounce = 0;
-
-    while (bounce < bounces_per_sample) {
+    for (int bounce = 0; bounce < max_bounces; ++bounce) {
 
         OptionalHit closest;
         Hittable* hittable = NULL;
@@ -293,32 +310,22 @@ __global__ void traceSample (
             traced = hadamard(traced, (Color)(SKY));
             break;
         }
-
-        ++bounce;
     }
 
-    samples[(depth * width * height) + (row * width) + col] = traced;
+    states[thread] = local_state;
+    image[thread] += traced;
 }
 
-__global__ void reduceSamples (
-    Color* samples,
-    const int image_height,
-    const int image_width,
-    Color* reduced_samples,
-    int samples_per_pixel
-) {
+__global__ void divideSamples (Camera camera, Color* image, int sample_count) {
 
+    int height = camera.getImageHeight();
+    int width = camera.getImageWidth();
     int row = (blockDim.y * blockIdx.y) + threadIdx.y;
     int col = (blockDim.x * blockIdx.x) + threadIdx.x;
 
-    if (image_height <= row || image_width <= col) return;
+    int thread = (row * width) + col;
 
-    reduced_samples[(row * image_width) + col] = { 0, 0, 0 };
+    if (height <= row || width <= col) return;
 
-    for (int i = 0; i < samples_per_pixel; ++i) {
-        Color sample = samples[(i * image_width * image_height) + (row * image_width) + col];
-        reduced_samples[(row * image_width) + col] += sample;
-    }
-
-    reduced_samples[(row * image_width) + col] /= samples_per_pixel;
+    image[thread] /= sample_count;
 }

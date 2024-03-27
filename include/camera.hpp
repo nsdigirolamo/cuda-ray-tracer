@@ -36,7 +36,7 @@ class Camera {
 
     public:
 
-        Camera(
+        __host__ __device__ Camera(
             const Point& origin,
             const int image_height,
             const int image_width,
@@ -44,25 +44,25 @@ class Camera {
             const Point& focal_point
         );
 
-        Point getOrigin () const;
+        __host__ __device__ Point getOrigin () const;
 
-        int getImageHeight () const;
-        int getImageWidth () const;
+        __host__ __device__ int getImageHeight () const;
+        __host__ __device__ int getImageWidth () const;
 
-        double getVfov () const;
-        double getHfov () const;
+        __host__ __device__ double getVfov () const;
+        __host__ __device__ double getHfov () const;
 
-        double getViewHeight () const;
-        double getViewWidth () const;
-        double getFocalDistance () const;
+        __host__ __device__ double getViewHeight () const;
+        __host__ __device__ double getViewWidth () const;
+        __host__ __device__ double getFocalDistance () const;
 
-        double getPixelHeight () const;
-        double getPixelWidth () const;
+        __host__ __device__ double getPixelHeight () const;
+        __host__ __device__ double getPixelWidth () const;
 
-        UnitVector<3> getUpDirection () const;
-        UnitVector<3> getViewDirection () const;
-        UnitVector<3> getViewTop () const;
-        UnitVector<3> getViewLeft () const;
+        __host__ __device__ UnitVector<3> getUpDirection () const;
+        __host__ __device__ UnitVector<3> getViewDirection () const;
+        __host__ __device__ UnitVector<3> getViewTop () const;
+        __host__ __device__ UnitVector<3> getViewLeft () const;
 
         /**
          * @brief Generates a ray origin.
@@ -76,78 +76,58 @@ class Camera {
          *
          * @return Point
          */
-        __device__ Point calculatePixelLocation () const;
+        __device__ Point calculatePixelLocation (curandState* state) const;
 
         /**
          * @brief Get the initial ray for a pixel.
          *
          * @return Ray A ray from the camera's origin to the pixel in the scene.
          */
-        __device__ Ray getInitialRay () const;
+        __device__ Ray getInitialRay (curandState* state) const;
 
-        /**
-         * @brief Renders the image.
-         *
-         * @param samples_per_pixel Number of samples per pixel in the image.
-         * @param bounces_per_sample The maximum number of bounces a sample can take.
-         * @return Image The rendered image.
-         */
-        Image render (
-            const int samples_per_pixel,
-            const int bounces_per_sample
-        ) const;
+        Image render (const int sample_count, const int max_bounces) const;
 };
 
 /**
- * @brief Allocates space for and generates the scene's hittables.
- * This kernel should be launched by a single thread in a single block.
- *
- * @return __global__
- */
+ * @brief Generates hittables in the scene and stores them in device memory.
+*/
 __global__ void setupHittables ();
 
 /**
- * @brief Allocates space for and generates the device's random states. Should
- * be launched with the same dimensions as traceSample.
+ * @brief Sets up the curandState for each thread and stores them in device memory.
  *
- * @param device_states Device allocated storage for the generated states.
- * @param seed The seed to be used for random number generation.
- */
-__global__ void setupRandoms (curandState* device_states, uint64_t seed);
+ * @param camera The camera being used to render the image.
+ * @param states A device pointer with enough allocated memory to store all states.
+ * @param seed The seed to be used to generate all states.
+*/
+__global__ void setupRandStates (Camera camera, curandState* states, uint64_t seed);
 
 /**
- * @brief Traces a sample in the scene. Each sample should have its own thread.
- * The gridDims for this kernel should be as follows: (image_width, image_height).
- * The blockDims for this kernel should be as follows: (samples_per_pixel).
+ * @brief Sets all pixel values in the image to initially be zero.
  *
- * @param camera The camera that is viewing the scene.
- * @param samples A 3D array of samples allocated to device memory.
- * @param bounces_per_sample The maximum number of bounces per sample.
- */
-__global__ void traceSample (
-    Camera camera,
-    Color* samples,
-    const int bounces_per_sample,
-    curandState* device_states
-);
+ * @param camera The camera being used to render the image.
+ * @param image A device pointer with enough allocated memory to store all pixels.
+*/
+__global__ void setupImage (Camera camera, Color* image);
 
 /**
- * @brief Reduces a 3D array of samples down to a 2D array of pixels. Each pixel
- * in the 2D array should have a single thread assigned to it.
+ * @brief Traces a sample for each pixel in the image, and adds that sample color
+ * value to the respective pixel.
  *
- * @param samples A 3D array of samples allocated to device memory.
- * @param image_height The height of samples.
- * @param image_width The width of samples.
- * @param reduced_samples A 2D array of pixels allocated to device memory.
- * @param samples_per_pixel The depth of samples.
- */
-__global__ void reduceSamples (
-    Color* samples,
-    const int image_height,
-    const int image_width,
-    Color* reduced_samples,
-    int samples_per_pixel
-);
+ * @param camera The camera being used to render the image.
+ * @param image A device pointer to the pixel data.
+ * @param states A device pointer to curandState data.
+ * @param max_bounces The maximum number of bounces to trace for each sample.
+*/
+__global__ void traceSamples (Camera camera, Color* image, curandState* states, int max_bounces);
 
+/**
+ * @brief Averages out the pixel color data in the image.
+ *
+ * @param camera The camera being used to render the image.
+ * @param image A device pointer to the pixel data.
+ * @param sample_count The number of samples used to render the image.
+*/
+__global__ void divideSamples (Camera camera, Color* image, int sample_count);
 
 #endif
