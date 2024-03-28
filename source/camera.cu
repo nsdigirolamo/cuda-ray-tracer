@@ -132,6 +132,7 @@ __device__ Point Camera::calculatePixelLocation (curandState* state) const {
     y += offset[1] * this->pixel_height;
 
     return
+        this->origin +
         this->view_left * x +
         this->view_top * y +
         this->view_direction * this->focal_distance;
@@ -141,6 +142,15 @@ __device__ Ray Camera::getInitialRay (curandState* state) const {
 
     Point ray_origin = generateRayOrigin(state);
     Point ray_direction = calculatePixelLocation(state) - ray_origin;
+
+    int row = (blockDim.y * blockIdx.y) + threadIdx.y;
+    int col = (blockDim.x * blockIdx.x) + threadIdx.x;
+
+    if (row == 1080 / 2 && col == 1920 / 2) {
+        printf("Camera Origin: %f %f %f ", this->origin[0], this->origin[1], this->origin[2]);
+        printf("Ray Origin: %f %f %f ", ray_origin[0], ray_origin[1], ray_origin[2]);
+        printf("Ray Direction: %f %f %f ", ray_direction[0], ray_direction[1], ray_direction[2]);
+    }
 
     return { ray_origin, ray_direction };
 }
@@ -218,25 +228,25 @@ Image Camera::render (const int sample_count, const int max_bounces) const {
 __global__ void setupHittables () {
 
     Sphere* sphere1 = new Sphere(
-        {{ 0, 0, 20 }},
+        {{ 0, 0, 0 }},
         1,
         new Diffuse(FIREBRICK)
     );
 
     Sphere* sphere2 = new Sphere(
-        {{ 5, 0, 15 }},
+        {{ 5, 0, -5 }},
         1,
         new Diffuse(TURQUOISE)
     );
 
     Sphere* sphere3 = new Sphere(
-        {{ -5, 0, 25 }},
+        {{ -5, 0, 5 }},
         1,
         new Diffuse(REBECCAPURPLE)
     );
 
     Sphere* sphere4 = new Sphere(
-        {{ -10, 0, 30 }},
+        {{ -10, 0, 10 }},
         1,
         new Diffuse(MEDIUMSPRINGGREEN)
     );

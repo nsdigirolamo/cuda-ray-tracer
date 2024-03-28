@@ -53,7 +53,7 @@ class Camera {
             const int image_width,
             const double hfov,
             const Point& focal_point,
-            const double focal_length
+            const double focal_angle
         );
 
         __host__ __device__ Point getOrigin () const;
