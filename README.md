@@ -3,8 +3,8 @@
 This is a ray tracer written in C++ accelerated with the CUDA parallel computing
 platform. When I started working on this project, I was following the guide of
 the [Ray Tracing in One Weekend](https://raytracing.github.io/) textbook by
-Peter Shirley, Trever D. Black, and Steve Hollasch. You can find my the older
-serial version of this codebase at [this repository.](https://github.com/nsdigirolamo/ray-tracing-playground)
+Peter Shirley, Trever D. Black, and Steve Hollasch. You can find the older serial 
+version of this codebase at [this repository.](https://github.com/nsdigirolamo/ray-tracing-playground)
 
 ## Overview
 
