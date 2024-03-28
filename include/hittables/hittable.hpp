@@ -1,7 +1,7 @@
 #ifndef HITTABLE_HPP
 #define HITTABLE_HPP
 
-#define MIN_HIT_DISTANCE 0.00001
+#define MIN_HIT_DISTANCE 0.0001
 
 #include "materials/material.hpp"
 #include "optional_hit.hpp"
