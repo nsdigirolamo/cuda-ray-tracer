@@ -141,16 +141,7 @@ __device__ Point Camera::calculatePixelLocation (curandState* state) const {
 __device__ Ray Camera::getInitialRay (curandState* state) const {
 
     Point ray_origin = generateRayOrigin(state);
-    Point ray_direction = calculatePixelLocation(state) - ray_origin;
-
-    int row = (blockDim.y * blockIdx.y) + threadIdx.y;
-    int col = (blockDim.x * blockIdx.x) + threadIdx.x;
-
-    if (row == 1080 / 2 && col == 1920 / 2) {
-        printf("Camera Origin: %f %f %f ", this->origin[0], this->origin[1], this->origin[2]);
-        printf("Ray Origin: %f %f %f ", ray_origin[0], ray_origin[1], ray_origin[2]);
-        printf("Ray Direction: %f %f %f ", ray_direction[0], ray_direction[1], ray_direction[2]);
-    }
+    Vector<3> ray_direction = calculatePixelLocation(state) - ray_origin;
 
     return { ray_origin, ray_direction };
 }

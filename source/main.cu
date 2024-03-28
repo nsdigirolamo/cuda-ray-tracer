@@ -17,10 +17,6 @@ int main () {
         5.0
     };
 
-    std::cout << camera.getLensRadius() << "\n";
-    std::cout << camera.getFocalDistance() << "\n";
-    std::cout << camera.getViewDirection()[0] << " " << camera.getViewDirection()[1] << " " << camera.getViewDirection()[2] << "\n";
-
     Image image = camera.render(50, 50);
 
     image.writeToFile("render");
