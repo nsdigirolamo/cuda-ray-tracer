@@ -6,6 +6,7 @@
 #include "hittables/sphere.hpp"
 #include "materials/diffuse.hpp"
 #include "materials/metallic.hpp"
+#include "materials/refractive.hpp"
 #include "utils/cuda_utils.hpp"
 #include "utils/rand_utils.hpp"
 
@@ -184,7 +185,7 @@ Image Camera::render (const int sample_count, const int max_bounces) const {
     size_t states_size = sizeof(curandState) * this->image_width * this->image_height;
     CUDA_ERROR_CHECK( cudaMalloc(&states, states_size) );
 
-    setupRandStates<<<grid_dims, block_dims>>>(*this, states, time(NULL));
+    setupRandStates<<<grid_dims, block_dims>>>(*this, states);
     e = cudaGetLastError();
     CUDA_ERROR_CHECK(e);
     CUDA_ERROR_CHECK( cudaDeviceSynchronize() );
@@ -218,44 +219,69 @@ Image Camera::render (const int sample_count, const int max_bounces) const {
 
 __global__ void setupHittables () {
 
-    Sphere* sphere1 = new Sphere(
+    curandState state;
+    curand_init(1234, 0, 0, &state);
+
+    Plane* ground = new Plane(
         {{ 0, 0, 0 }},
-        1,
-        new Diffuse(FIREBRICK)
+        {{ 0, 1, 0 }},
+        new Diffuse({ CORAL })
+    );
+
+    Sphere* sphere1 = new Sphere(
+        {{ 0, 1, 0 }},
+        1.0,
+        new Refractive({ WHITESMOKE }, 1.5)
     );
 
     Sphere* sphere2 = new Sphere(
-        {{ 5, 0, -5 }},
-        1,
-        new Diffuse(TURQUOISE)
+        {{ -4, 1, 0 }},
+        1.0,
+        new Diffuse({ FIREBRICK })
     );
 
     Sphere* sphere3 = new Sphere(
-        {{ -5, 0, 5 }},
-        1,
-        new Diffuse(REBECCAPURPLE)
+        {{ 4, 1, 0 }},
+        1.0,
+        new Metallic({ STEELBLUE }, 0.0)
     );
 
-    Sphere* sphere4 = new Sphere(
-        {{ -10, 0, 10 }},
-        1,
-        new Diffuse(MEDIUMSPRINGGREEN)
-    );
-
-    Plane* plane = new Plane(
-        {{ 0, -1, 0 }},
-        {{ 0, 1, 0 }},
-        new Diffuse(SLATEGRAY)
-    );
-
-    hittables_count = 5;
+    hittables_count = 404;
     hittables = (Hittable**)(malloc(sizeof(Hittable*) * hittables_count));
 
-    hittables[0] = sphere1;
-    hittables[1] = sphere2;
-    hittables[2] = sphere3;
-    hittables[3] = sphere4;
-    hittables[4] = plane;
+    int idx = 0;
+
+    for (int i = -10; i < 10; ++i) {
+        for (int j = -10; j < 10; ++j) {
+
+            double choose_mat = curand_uniform_double(&state);
+            Color color { curand_uniform_double(&state), curand_uniform_double(&state), curand_uniform_double(&state) };
+            Material* mat;
+
+            if (choose_mat < 0.33) {
+                mat = new Diffuse(color);
+            } else if (choose_mat < 0.66) {
+                mat = new Metallic(color, curand_uniform_double(&state));
+            } else {
+                mat = new Refractive(color, 2.0 * curand_uniform_double(&state));
+            }
+
+            Sphere* s = new Sphere(
+                {{ (double)(2 * i), 0.2, (double)(2 * j) }},
+                0.2,
+                mat
+            );
+
+            hittables[idx] = s;
+
+            ++idx;
+        }
+    }
+
+    hittables[400] = sphere1;
+    hittables[401] = sphere2;
+    hittables[402] = sphere3;
+    hittables[403] = ground;
 }
 
 __global__ void setupRandStates (Camera camera, curandState* states, uint64_t seed) {

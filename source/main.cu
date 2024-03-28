@@ -9,15 +9,15 @@ int main () {
     clock_t start = clock();
 
     Camera camera {
-        {{ 0, 0, -20 }},
+        {{13, 0.75, 3}},
         1080,
         1920,
-        90,
-        {{ 0, 0, 0 }},
-        5.0
+        35,
+        {{ 4, 1, 0 }},
+        0.4
     };
 
-    Image image = camera.render(50, 50);
+    Image image = camera.render(100, 100);
 
     image.writeToFile("render");
 
