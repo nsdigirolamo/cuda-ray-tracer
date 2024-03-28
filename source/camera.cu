@@ -23,7 +23,8 @@ Camera::Camera(
     const int image_height,
     const int image_width,
     const double hfov,
-    const Point& focal_point
+    const Point& focal_point,
+    const double focal_angle
 ) {
 
     this->origin = origin;
@@ -31,7 +32,10 @@ Camera::Camera(
     this->image_height = image_height;
     this->image_width = image_width;
 
-    this->focal_distance = (focal_point - origin).length();
+    this->focal_distance = ((Vector<3>)(focal_point - origin)).length();
+
+    this->lens_radius = this->focal_distance * tan(degsToRads(focal_angle) / 2.0);
+
     this->view_width = 2.0 * this->focal_distance * tan(degsToRads(hfov) / 2.0);
     this->view_height = this->view_width * image_height / image_width;
 
@@ -79,6 +83,10 @@ double Camera::getFocalDistance () const {
     return this->focal_distance;
 }
 
+double Camera::getLensRadius () const {
+    return this->lens_radius;
+}
+
 double Camera::getPixelHeight () const {
     return this->pixel_height;
 }
@@ -103,18 +111,12 @@ UnitVector<3> Camera::getViewLeft () const {
     return this->view_left;
 }
 
-__device__ Point Camera::generateRayOrigin () const {
+__device__ Point Camera::generateRayOrigin (curandState* state) const {
 
-    /**
-     * TODO: Implement random offset
-     *
-     * return this->location +
-     *  (offset[0] * this->focal_radius * this->view_horizontal) +
-     *  (offset[1] * this->focal_radius * this->view_vertical);
-     *
-     */
-
-    return this->origin;
+       Vector<2> offset = randomInUnitCircle(state);
+       return this->origin +
+           offset[0] * this->lens_radius * this->view_left +
+           offset[1] * this->lens_radius * this->view_top;
 }
 
 __device__ Point Camera::calculatePixelLocation (curandState* state) const {
@@ -137,9 +139,10 @@ __device__ Point Camera::calculatePixelLocation (curandState* state) const {
 
 __device__ Ray Camera::getInitialRay (curandState* state) const {
 
-    Point origin = this->generateRayOrigin();
-    UnitVector<3> direction = this->calculatePixelLocation(state) - this->origin;
-    return { origin, direction };
+    Point ray_origin = generateRayOrigin(state);
+    Point ray_direction = calculatePixelLocation(state) - ray_origin;
+
+    return { ray_origin, ray_direction };
 }
 
 Image Camera::render (const int sample_count, const int max_bounces) const {
@@ -214,10 +217,28 @@ Image Camera::render (const int sample_count, const int max_bounces) const {
 
 __global__ void setupHittables () {
 
-    Sphere* sphere = new Sphere(
-        {{ 0, 0, 0 }},
+    Sphere* sphere1 = new Sphere(
+        {{ 0, 0, 20 }},
         1,
         new Diffuse(FIREBRICK)
+    );
+
+    Sphere* sphere2 = new Sphere(
+        {{ 5, 0, 15 }},
+        1,
+        new Diffuse(TURQUOISE)
+    );
+
+    Sphere* sphere3 = new Sphere(
+        {{ -5, 0, 25 }},
+        1,
+        new Diffuse(REBECCAPURPLE)
+    );
+
+    Sphere* sphere4 = new Sphere(
+        {{ -10, 0, 30 }},
+        1,
+        new Diffuse(MEDIUMSPRINGGREEN)
     );
 
     Plane* plane = new Plane(
@@ -226,11 +247,14 @@ __global__ void setupHittables () {
         new Diffuse(SLATEGRAY)
     );
 
-    hittables_count = 2;
+    hittables_count = 5;
     hittables = (Hittable**)(malloc(sizeof(Hittable*) * hittables_count));
 
-    hittables[0] = sphere;
-    hittables[1] = plane;
+    hittables[0] = sphere1;
+    hittables[1] = sphere2;
+    hittables[2] = sphere3;
+    hittables[3] = sphere4;
+    hittables[4] = plane;
 }
 
 __global__ void setupRandStates (Camera camera, curandState* states, uint64_t seed) {
