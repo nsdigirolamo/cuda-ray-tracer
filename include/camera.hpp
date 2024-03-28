@@ -116,7 +116,7 @@ __global__ void setupHittables ();
  * @param states A device pointer with enough allocated memory to store all states.
  * @param seed The seed to be used to generate all states.
 */
-__global__ void setupRandStates (Camera camera, curandState* states, uint64_t seed);
+__global__ void setupRandStates (Camera camera, curandState* states, uint64_t seed = 1234);
 
 /**
  * @brief Sets all pixel values in the image to initially be zero.
