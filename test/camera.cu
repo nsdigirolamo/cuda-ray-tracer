@@ -9,13 +9,15 @@ TEST_SUITE ("Initialization Tests") {
     int expected_image_width = 1920;
     double expected_hfov = 90;
     Point focal_point {{ 0, 0, 1 }};
+    double focal_angle = 1.0;
 
     Camera actual {
         expected_origin,
         expected_image_height,
         expected_image_width,
         expected_hfov,
-        focal_point
+        focal_point,
+        focal_angle
     };
 
     TEST_CASE ("Origin is as expected.") {
@@ -40,12 +42,14 @@ TEST_SUITE ("Initialization Tests") {
     double expected_focal_distance = 1;
     double expected_view_width = 2.0;
     double expected_view_height = expected_view_width * ((double)(expected_image_height) / (double)(expected_image_width));
+    double expected_lens_radius = 0.00872;
 
     TEST_CASE ("View dimensions are as expected.") {
 
         CHECK(actual.getViewHeight() == doctest::Approx(expected_view_height));
         CHECK(actual.getViewWidth() == doctest::Approx(expected_view_width));
         CHECK(actual.getFocalDistance() == doctest::Approx(expected_focal_distance));
+        CHECK(actual.getLensRadius() == doctest::Approx(expected_lens_radius));
     }
 
     double expected_pixel_width = expected_view_width / expected_image_width;
