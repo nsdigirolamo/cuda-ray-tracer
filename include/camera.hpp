@@ -25,6 +25,7 @@ class Camera {
         double view_height; // The height of the view plane.
         double view_width; // The width of the view plane.
         double focal_distance; // The distance between the view plane and the camera's origin.
+        double lens_radius; // The radius of the simulated lens.
 
         double pixel_height; // The height of a pixel projected on the view plane.
         double pixel_width; // The width of a pixel projected on the view plane.
@@ -36,12 +37,23 @@ class Camera {
 
     public:
 
-        __host__ __device__ Camera(
+        /**
+         * @brief Constructs a new Camera object.
+         *
+         * @param origin The camera's position in the scene.
+         * @param image_height The height of the rendered image in pixels.
+         * @param image_width The height of the rendered image in pixels.
+         * @param hfov The horizontal field of view of the camera in degrees.
+         * @param focal_point The point of focus for the camera.
+         * @param focal_angle The maximum angle a ray can arrive at the focal point.
+        */
+        __host__ Camera(
             const Point& origin,
             const int image_height,
             const int image_width,
             const double hfov,
-            const Point& focal_point
+            const Point& focal_point,
+            const double focal_length
         );
 
         __host__ __device__ Point getOrigin () const;
@@ -55,6 +67,7 @@ class Camera {
         __host__ __device__ double getViewHeight () const;
         __host__ __device__ double getViewWidth () const;
         __host__ __device__ double getFocalDistance () const;
+        __host__ __device__ double getLensRadius () const;
 
         __host__ __device__ double getPixelHeight () const;
         __host__ __device__ double getPixelWidth () const;
@@ -67,13 +80,15 @@ class Camera {
         /**
          * @brief Generates a ray origin.
          *
+         * @param state The random state of the calling thread.
          * @return Point
          */
-        __device__ Point generateRayOrigin () const;
+        __device__ Point generateRayOrigin (curandState* state) const;
 
         /**
          * @brief Calculates a pixel's location in the scene based on its index.
          *
+         * @param state The random state of the calling thread.
          * @return Point
          */
         __device__ Point calculatePixelLocation (curandState* state) const;
@@ -81,6 +96,7 @@ class Camera {
         /**
          * @brief Get the initial ray for a pixel.
          *
+         * @param state The random state of the calling thread.
          * @return Ray A ray from the camera's origin to the pixel in the scene.
          */
         __device__ Ray getInitialRay (curandState* state) const;
