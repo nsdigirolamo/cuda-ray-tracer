@@ -14,10 +14,10 @@ class Sphere : public Hittable {
     public:
 
         __host__ __device__ Sphere(const Point& origin, const double radius, Material* material);
-        __host__ __device__ ~Sphere ();
+        __host__ __device__ ~Sphere () override;
 
-        __host__ __device__ Optional<Hit> checkHit (const Ray& ray) const;
-        __host__ __device__ Optional<const Material*> getMaterial () const;
+        __host__ __device__ Optional<Hit> checkHit (const Ray& ray) const override;
+        __host__ __device__ Optional<const Material*> getMaterial () const override;
 };
 
 #endif
