@@ -351,10 +351,16 @@ __global__ void traceSamples (Camera camera, Color* image, curandState* states, 
         if (closest.exists) {
 
             Hit hit = closest.value;
-            const Material* material = hit.hittable->getMaterial();
+            const Material* material;
 
-            traced = hadamard(traced, material->getColor());
-            ray = material->scatter(hit, &local_state);
+            Optional<const Material*> opt = hit.hittable->getMaterial();
+
+            if (opt.exists) {
+
+                material = opt.value;
+                traced = hadamard(traced, material->getColor());
+                ray = material->scatter(hit, &local_state);
+            }
 
         } else {
 

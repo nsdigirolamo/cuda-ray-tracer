@@ -42,6 +42,6 @@ __host__ __device__ Optional<Hit> Plane::checkHit (const Ray& ray) const {
     return opt;
 }
 
-__host__ __device__ const Material* Plane::getMaterial () const {
+__host__ __device__ Optional<const Material*> Plane::getMaterial () const {
     return this->material;
 }

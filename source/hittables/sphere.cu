@@ -58,6 +58,6 @@ __host__ __device__ Optional<Hit> Sphere::checkHit (const Ray& ray) const {
     return opt;
 }
 
-__host__ __device__ const Material* Sphere::getMaterial () const {
+__host__ __device__ Optional<const Material*> Sphere::getMaterial () const {
     return this->material;
 }

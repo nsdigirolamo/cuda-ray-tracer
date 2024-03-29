@@ -13,7 +13,7 @@ class Hittable {
         __host__ __device__ virtual ~Hittable () { };
 
         __host__ __device__ virtual Optional<Hit> checkHit (const Ray& ray) const = 0;
-        __host__ __device__ virtual const Material* getMaterial () const = 0;
+        __host__ __device__ virtual Optional<const Material*> getMaterial () const = 0;
 };
 
 #endif
