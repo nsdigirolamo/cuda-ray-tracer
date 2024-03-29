@@ -11,9 +11,9 @@ __host__ __device__ Plane::~Plane () {
     this->material = NULL;
 }
 
-__host__ __device__ OptionalHit Plane::checkHit (const Ray& ray) const {
+__host__ __device__ Optional<Hit> Plane::checkHit (const Ray& ray) const {
 
-    OptionalHit opt;
+    Optional<Hit> opt;
 
     double denominator = dot(ray.direction, this->normal);
 
@@ -28,6 +28,7 @@ __host__ __device__ OptionalHit Plane::checkHit (const Ray& ray) const {
         UnitVector<3> surface_normal = this->normal * (is_front ? 1.0 : -1.0);
 
         Hit hit {
+            this,
             ray,
             distance,
             intersection,
@@ -41,6 +42,6 @@ __host__ __device__ OptionalHit Plane::checkHit (const Ray& ray) const {
     return opt;
 }
 
-__host__ __device__ Material* Plane::getMaterial () {
+__host__ __device__ const Material* Plane::getMaterial () const {
     return this->material;
 }

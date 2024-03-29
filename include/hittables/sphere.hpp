@@ -16,8 +16,8 @@ class Sphere : public Hittable {
         __host__ __device__ Sphere(const Point& origin, const double radius, Material* material);
         __host__ __device__ ~Sphere ();
 
-        __host__ __device__ OptionalHit checkHit (const Ray& ray) const;
-        __host__ __device__ Material* getMaterial ();
+        __host__ __device__ Optional<Hit> checkHit (const Ray& ray) const;
+        __host__ __device__ const Material* getMaterial () const;
 };
 
 #endif

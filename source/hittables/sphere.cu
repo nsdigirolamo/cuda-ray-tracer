@@ -11,9 +11,9 @@ __host__ __device__ Sphere::~Sphere () {
     this->material = NULL;
 }
 
-__host__ __device__ OptionalHit Sphere::checkHit (const Ray& ray) const {
+__host__ __device__ Optional<Hit> Sphere::checkHit (const Ray& ray) const {
 
-    OptionalHit opt;
+    Optional<Hit> opt;
 
     UnitVector<3> ud = ray.direction;
     Vector<3> oc = ray.origin - this->origin;
@@ -44,6 +44,7 @@ __host__ __device__ OptionalHit Sphere::checkHit (const Ray& ray) const {
         surface_normal = surface_normal * (is_front ? 1.0 : -1.0);
 
         Hit hit {
+            this,
             ray,
             distance,
             intersection,
@@ -57,6 +58,6 @@ __host__ __device__ OptionalHit Sphere::checkHit (const Ray& ray) const {
     return opt;
 }
 
-__host__ __device__ Material* Sphere::getMaterial () {
+__host__ __device__ const Material* Sphere::getMaterial () const {
     return this->material;
 }
