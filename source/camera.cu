@@ -14,6 +14,8 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 
+#include "optional.hpp"
+
 #define BLOCK_DIM 16
 
 __device__ Hittable** hittables;
@@ -330,28 +332,26 @@ __global__ void traceSamples (Camera camera, Color* image, curandState* states, 
 
     for (int bounce = 0; bounce < max_bounces; ++bounce) {
 
-        OptionalHit closest;
-        Hittable* hittable = NULL;
+        Optional<Hit> closest;
 
         for (int i = 0; i < hittables_count; ++i) {
 
-            OptionalHit opt = hittables[i]->checkHit(ray);
+            Optional<Hit> opt = hittables[i]->checkHit(ray);
 
             bool hit_is_closest =
                 opt.exists &&
                 closest.exists &&
-                opt.hit.distance < closest.hit.distance;
+                opt.value.distance < closest.value.distance;
 
             if (opt.exists && (!closest.exists || hit_is_closest)) {
                 closest = opt;
-                hittable = hittables[i];
             }
         }
 
         if (closest.exists) {
 
-            Hit hit = closest.hit;
-            Material* material = hittable->getMaterial();
+            Hit hit = closest.value;
+            const Material* material = hit.hittable->getMaterial();
 
             traced = hadamard(traced, material->getColor());
             ray = material->scatter(hit, &local_state);
