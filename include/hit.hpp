@@ -4,9 +4,13 @@
 #include "ray.hpp"
 #include "vector.hpp"
 
+class Hittable;
+
 class Hit {
 
     public:
+
+        const Hittable* hittable; // The hittable that was hit.
 
         Ray incoming; // The ray that caused the hit.
         double distance; // The distance along the incoming ray where the hit occurred.
@@ -17,6 +21,7 @@ class Hit {
 
         __host__ __device__ Hit ();
         __host__ __device__ Hit (
+            const Hittable* hittable,
             const Ray& incoming,
             const double distance,
             const Point& origin,

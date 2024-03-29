@@ -6,13 +6,15 @@ __host__ __device__ Hit::Hit ()
 { }
 
 __host__ __device__ Hit::Hit (
+    const Hittable* hittable,
     const Ray& incoming,
     const double distance,
     const Point& origin,
     const UnitVector<3>& surface_normal,
     const bool is_front
 )
-    : incoming(incoming)
+    : hittable(hittable)
+    , incoming(incoming)
     , distance(distance)
     , origin(origin)
     , surface_normal(surface_normal)
