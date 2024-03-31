@@ -26,4 +26,14 @@
     REQUIRE(lhs.exists == rhs.exists); \
     if (lhs.exists) CHECK_HITS(lhs, rhs);
 
+#define CHECK_INTERVALS(lhs, rhs) \
+    CHECK(lhs.min == doctest::Approx(rhs.min)); \
+    CHECK(lhs.max == doctest::Approx(rhs.max));
+
+#define CHECK_AABBS(lhs, rhs) \
+    CHECK(lhs.hittable == rhs.hittable); \
+    for (int i = 0; i < 3; ++i) { \
+        CHECK_INTERVALS(lhs.getInterval(i), rhs.getInterval(i)); \
+    }
+
 #endif
