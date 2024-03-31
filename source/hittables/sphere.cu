@@ -59,5 +59,21 @@ __host__ __device__ Optional<Hit> Sphere::checkHit (const Ray& ray) const {
 }
 
 __host__ __device__ Optional<const Material*> Sphere::getMaterial () const {
+
     return this->material;
 }
+
+__host__ __device__ AABB Sphere::getSurroundingAABB () const {
+
+    Vector<3> radius_vector {{ this->radius, this->radius, this->radius }};
+
+    Point max = origin + radius_vector;
+    Point min = origin - radius_vector;
+
+    return {
+        this,
+        { min[0], max[0] },
+        { min[1], max[1] },
+        { min[2], max[2] },
+    };
+};

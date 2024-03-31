@@ -7,6 +7,7 @@ __host__ __device__ Plane::Plane (const Point& origin, const UnitVector<3> norma
 { }
 
 __host__ __device__ Plane::~Plane () {
+
     delete this->material;
     this->material = NULL;
 }
@@ -43,5 +44,16 @@ __host__ __device__ Optional<Hit> Plane::checkHit (const Ray& ray) const {
 }
 
 __host__ __device__ Optional<const Material*> Plane::getMaterial () const {
+
     return this->material;
 }
+
+__host__ __device__ AABB Plane::getSurroundingAABB () const {
+
+    return {
+        this,
+        { -INFINITY, INFINITY },
+        { -INFINITY, INFINITY },
+        { -INFINITY, INFINITY },
+    };
+};

@@ -18,6 +18,7 @@ class Sphere : public Hittable {
 
         __host__ __device__ Optional<Hit> checkHit (const Ray& ray) const override;
         __host__ __device__ Optional<const Material*> getMaterial () const override;
+        __host__ __device__ AABB getSurroundingAABB () const override;
 };
 
 #endif
