@@ -19,6 +19,7 @@ TEST_SUITE ("Metallic Scatter Tests") {
         };
 
         Hit expected {
+            &plane,
             incoming,
             sqrt(2),
             {{ 0, 0, 0 }},
@@ -26,11 +27,11 @@ TEST_SUITE ("Metallic Scatter Tests") {
             true
         };
 
-        OptionalHit opt = plane.checkHit(incoming);
+        Optional<Hit> opt = plane.checkHit(incoming);
 
         REQUIRE(opt.exists);
 
-        Hit actual = opt.hit;
+        Hit actual = opt.value;
 
         CHECK_HITS(expected, actual);
     }
@@ -49,6 +50,7 @@ TEST_SUITE ("Metallic Scatter Tests") {
         };
 
         Hit expected {
+            &plane,
             incoming,
             sqrt(2),
             {{ 0, 0, 0 }},
@@ -56,11 +58,11 @@ TEST_SUITE ("Metallic Scatter Tests") {
             false
         };
 
-        OptionalHit opt = plane.checkHit(incoming);
+        Optional<Hit> opt = plane.checkHit(incoming);
 
         REQUIRE(opt.exists);
 
-        Hit actual = opt.hit;
+        Hit actual = opt.value;
 
         CHECK_HITS(expected, actual);
     }

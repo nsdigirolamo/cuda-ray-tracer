@@ -18,7 +18,7 @@ TEST_SUITE ("Sphere Hit Tests") {
             {{ 0, 0, -1 }}
         };
 
-        OptionalHit opt = sphere.checkHit(ray);
+        Optional<Hit> opt = sphere.checkHit(ray);
 
         CHECK_FALSE(opt.exists);
     }
@@ -30,7 +30,7 @@ TEST_SUITE ("Sphere Hit Tests") {
             {{ 0, 0, 1 }}
         };
 
-        OptionalHit opt = sphere.checkHit(ray);
+        Optional<Hit> opt = sphere.checkHit(ray);
 
         CHECK_FALSE(opt.exists);
     }
@@ -42,7 +42,7 @@ TEST_SUITE ("Sphere Hit Tests") {
             {{ 0, 0, -1 }}
         };
 
-        OptionalHit opt = sphere.checkHit(ray);
+        Optional<Hit> opt = sphere.checkHit(ray);
 
         CHECK_FALSE(opt.exists);
     }
@@ -54,12 +54,13 @@ TEST_SUITE ("Sphere Hit Tests") {
             {{ 0, 0, 1 }}
         };
 
-        OptionalHit opt = sphere.checkHit(ray);
+        Optional<Hit> opt = sphere.checkHit(ray);
 
         REQUIRE(opt.exists);
 
-        Hit actual = opt.hit;
+        Hit actual = opt.value;
         Hit expected {
+            &sphere,
             ray,
             10,
             {{ 1, 0, 10 }},
@@ -77,12 +78,13 @@ TEST_SUITE ("Sphere Hit Tests") {
             {{ 0, 0, 1 }}
         };
 
-        OptionalHit opt = sphere.checkHit(ray);
+        Optional<Hit> opt = sphere.checkHit(ray);
 
         REQUIRE(opt.exists);
 
-        Hit actual = opt.hit;
+        Hit actual = opt.value;
         Hit expected {
+            &sphere,
             ray,
             1,
             {{ 0, 0, 11 }},
@@ -100,12 +102,13 @@ TEST_SUITE ("Sphere Hit Tests") {
             {{ 0, 0, 1 }}
         };
 
-        OptionalHit opt = sphere.checkHit(ray);
+        Optional<Hit> opt = sphere.checkHit(ray);
 
         REQUIRE(opt.exists);
 
-        Hit actual = opt.hit;
+        Hit actual = opt.value;
         Hit expected {
+            &sphere,
             ray,
             9,
             {{ 0, 0, 9 }},

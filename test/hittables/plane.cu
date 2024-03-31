@@ -18,7 +18,7 @@ TEST_SUITE ("Plane Hit Tests") {
             {{ 0, 0, 1 }}
         };
 
-        OptionalHit opt = plane.checkHit(ray);
+        Optional<Hit> opt = plane.checkHit(ray);
 
         CHECK_FALSE(opt.exists);
     }
@@ -30,7 +30,7 @@ TEST_SUITE ("Plane Hit Tests") {
             {{ 0, 1, 0 }}
         };
 
-        OptionalHit opt = plane.checkHit(ray);
+        Optional<Hit> opt = plane.checkHit(ray);
 
         CHECK_FALSE(opt.exists);
     }
@@ -42,12 +42,13 @@ TEST_SUITE ("Plane Hit Tests") {
             {{ 0, -1, 0 }}
         };
 
-        OptionalHit opt = plane.checkHit(ray);
+        Optional<Hit> opt = plane.checkHit(ray);
 
         REQUIRE(opt.exists);
 
-        Hit actual = opt.hit;
+        Hit actual = opt.value;
         Hit expected = {
+            &plane,
             ray,
             1,
             {{ 0, 0, 0 }},
@@ -65,12 +66,13 @@ TEST_SUITE ("Plane Hit Tests") {
             {{ 0, 1, 0 }}
         };
 
-        OptionalHit opt = plane.checkHit(ray);
+        Optional<Hit> opt = plane.checkHit(ray);
 
         REQUIRE(opt.exists);
 
-        Hit actual = opt.hit;
+        Hit actual = opt.value;
         Hit expected {
+            &plane,
             ray,
             1,
             {{ 0, 0, 0 }},
