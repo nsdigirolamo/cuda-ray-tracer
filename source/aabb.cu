@@ -4,9 +4,9 @@
 
 __host__ __device__ AABB::AABB (
     const Hittable* bounded,
-    const Interval& x_interval,
-    const Interval& y_interval,
-    const Interval& z_interval
+    Interval x_interval,
+    Interval y_interval,
+    Interval z_interval
 )
     : bounded(bounded)
     , x_interval(x_interval)
@@ -14,7 +14,7 @@ __host__ __device__ AABB::AABB (
     , z_interval(z_interval)
 { }
 
-__host__ __device__ Interval AABB::getInterval (const int axis) const {
+__host__ __device__ const Interval AABB::getInterval (const int axis) const {
     return
         axis == 0 ? this->x_interval :
         axis == 1 ? this->y_interval :

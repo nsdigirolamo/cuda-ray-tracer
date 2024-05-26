@@ -9,22 +9,26 @@ class Hittable;
 
 class AABB {
 
+    private:
+
+        const Hittable* bounded;
+
+        Interval x_interval;
+        Interval y_interval;
+        Interval z_interval;
+
     public:
-
-        const Hittable* bounded = NULL;
-
-        const Interval x_interval;
-        const Interval y_interval;
-        const Interval z_interval;
 
         __host__ __device__ AABB (
             const Hittable* bounded,
-            const Interval& x_interval,
-            const Interval& y_interval,
-            const Interval& z_interval
+            Interval x_interval,
+            Interval y_interval,
+            Interval z_interval
         );
 
-        __host__ __device__ Interval getInterval (const int axis) const;
+        __host__ __device__ const Hittable* getBounded () const;
+
+        __host__ __device__ const Interval getInterval (const int axis) const;
 
         __host__ __device__ bool isHit (const Ray& ray) const;
 };

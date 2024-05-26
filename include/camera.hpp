@@ -105,11 +105,6 @@ class Camera {
 };
 
 /**
- * @brief Generates hittables in the scene and stores them in device memory.
-*/
-__global__ void setupHittables ();
-
-/**
  * @brief Sets up the curandState for each thread and stores them in device memory.
  *
  * @param camera The camera being used to render the image.

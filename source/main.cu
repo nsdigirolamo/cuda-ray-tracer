@@ -3,10 +3,13 @@
 
 #include "camera.hpp"
 #include "image.hpp"
+#include "scene.hpp"
 
 int main () {
 
     clock_t start = clock();
+
+    std::cout << "Setting up the scene... ";
 
     Camera camera {
         {{13, 0.75, 3}},
@@ -17,7 +20,11 @@ int main () {
         0.4
     };
 
-    Image image = camera.render(100, 100);
+    setupScene();
+
+    std::cout << "Setup complete. Beginning render.\n";
+
+    Image image = camera.render(10, 10);
 
     image.writeToFile("render");
 
