@@ -1,6 +1,6 @@
 # Nick's CUDA Ray Tracer
 
-![Final Render](https://www.nsdigirolamo.com/posts/cuda-ray-tracing/images/book1_final.png)
+![Final Render](https://www.nsdigirolamo.blog/posts/cuda-ray-tracing/book1_final.png)
 
 This is a ray tracer written in C++ accelerated with the CUDA parallel computing
 platform. When I started working on this project, I was following the guide of
